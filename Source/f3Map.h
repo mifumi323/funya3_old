@@ -84,7 +84,8 @@ public:
 	void OnMove();
 	BYTE GetMapData(int level, int x, int y);
 	bool GetHit(int x, int y, BYTE hit);
-	void OnDraw(CDIB32 *lp);
+	void OnDraw(CDIB32 *lp) { OnDraw(lp, false); }
+	void OnDraw(CDIB32 *lp, bool bShowHit);
 	Cf3Map(Cf3StageFile*lp,int stage,bool playable=true);
 	virtual ~Cf3Map();
 

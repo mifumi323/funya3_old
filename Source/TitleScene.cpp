@@ -40,7 +40,7 @@ void CTitleScene::OnInit()
 	m_NavigationBar = new Cf3NavigationBar;
 	m_StageFile = new Cf3StageFile;
 	m_Select = new Cf3Select;
-	m_Select->SetPos(160-32*5/2,120+8);
+	m_Select->SetPos(160-32*5/2,120+8-32);
 	m_TextStageFile = new CTextDIB32;
 	m_TextStageFile->GetFont()->SetSize(32);
 	m_TextStageFile->GetFont()->SetColor(0xffffff);
@@ -95,10 +95,10 @@ void CTitleScene::OnDraw(CDIB32 *lp)
 	m_Map->OnDraw(lp);
 	int w,h;
 	m_TextStageFile->GetSize(w,h);
-	if (w<=320) lp->Blt(m_TextStageFile,160-w/2,120-24-h/2);
+	if (w<=320) lp->Blt(m_TextStageFile,160-w/2,120-24-32-h/2);
 	else {
 		SIZE sz = { 320, h*320/w };
-		lp->Blt(m_TextStageFile,0,120-24-sz.cy/2,NULL, &sz);
+		lp->Blt(m_TextStageFile,0,120-24-32-sz.cy/2,NULL, &sz);
 	}
 	m_NavigationBar->OnDraw(lp);
 }
@@ -145,8 +145,9 @@ void CTitleScene::SetStage()
 				theSetting->GetProgress(*m_itStageFile));
 			navi+=buf;
 		}
-		navi+="　ステージ名：";
-		navi+=m_TextStageFile->GetFont()->GetText();
+		// これはでかでかと表示されてるからいらんか
+		//navi+="　ステージ名：";
+		//navi+=m_TextStageFile->GetFont()->GetText();
 		str=(char*)m_StageFile->GetStageData(CT_AUTH,&size);
 		if (str>0 && size>0) {
 			char strbuf[257]={0};	// 0で初期化
@@ -169,15 +170,15 @@ void CTitleScene::SetStage()
 	m_Select->Clear();
 	m_Select->Add("はじめから", 0);
 	BYTE*Buf = m_StageFile->GetStageData(CT_PNLT);
-	m_nPenalty = (Buf?*Buf:100);
+	m_nPenalty = (Buf?*((WORD*)Buf):100);
 	if (theSetting->GetProgress(*m_itStageFile)&&
 		m_nPenalty<=theSetting->m_Banana) {
 		char strbuf[256];
 		sprintf(strbuf,"続きから(%d)",m_nPenalty);
 		m_Select->Add(strbuf, 1);
-		m_Select->Select(1);
+		m_Select->SelectPos(1);
 	}
-	m_Select->Add("終わる", 99);
+	m_Select->Add("戻る", 99);
 }
 
 void CTitleScene::SetMap(int map)

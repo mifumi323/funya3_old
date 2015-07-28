@@ -16,6 +16,7 @@
 #define CENTERY 104
 
 bool CGameScene::m_bTest = false;
+bool CGameScene::m_bVisibleHit = false;
 int CGameScene::m_nStage = 0;
 
 //////////////////////////////////////////////////////////////////////
@@ -54,7 +55,7 @@ void CGameScene::OnInit()
 	Buf = m_StageFile->GetStageData(CT_REST);
 	m_nRest = (Buf?*Buf:4);
 	Buf = m_StageFile->GetStageData(CT_PNLT);
-	m_nPenalty = (Buf?*Buf:100);
+	m_nPenalty = (Buf?*((WORD*)Buf):100);
 	m_Map = NULL;
 	// ナビゲーション
 	m_NavigationBar = new Cf3NavigationBar;
@@ -206,7 +207,7 @@ void CGameScene::OnDraw(CDIB32 *lp)
 	}
 	switch (m_State) {
 	case GSS_PLAYING: {
-		m_Map->OnDraw(lp);
+		m_Map->OnDraw(lp, m_bTest&&m_bVisibleHit);
 		m_NavigationBar->OnDraw(lp);
 		break;
 					  }

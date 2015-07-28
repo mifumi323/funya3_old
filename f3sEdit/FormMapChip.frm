@@ -4,7 +4,7 @@ Begin VB.Form FormMapChip
    Caption         =   "マップチップ"
    ClientHeight    =   3090
    ClientLeft      =   60
-   ClientTop       =   330
+   ClientTop       =   615
    ClientWidth     =   4680
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
@@ -81,6 +81,80 @@ Begin VB.Form FormMapChip
       Top             =   1320
       Width           =   2055
    End
+   Begin VB.Menu mnu 
+      Caption         =   "メニュー"
+      Begin VB.Menu mnuHit 
+         Caption         =   "地面(上に乗れる)"
+         Index           =   0
+         Tag             =   "1"
+      End
+      Begin VB.Menu mnuHit 
+         Caption         =   "天井(下から通り抜けられない)"
+         Index           =   1
+         Tag             =   "2"
+      End
+      Begin VB.Menu mnuHit 
+         Caption         =   "左壁(左から通り抜けられない)"
+         Index           =   2
+         Tag             =   "4"
+      End
+      Begin VB.Menu mnuHit 
+         Caption         =   "右壁(右から通り抜けられない)"
+         Index           =   3
+         Tag             =   "8"
+      End
+      Begin VB.Menu mnuHit 
+         Caption         =   "とげ(触れるとミス)"
+         Index           =   4
+         Tag             =   "16"
+      End
+      Begin VB.Menu mnuS 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuF 
+         Caption         =   "摩擦"
+         Begin VB.Menu mnuFriction 
+            Caption         =   "1.00 全く滑らない"
+            Index           =   0
+            Tag             =   "224"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.20 ほとんど滑らない"
+            Index           =   1
+            Tag             =   "192"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.15 普通より滑らない"
+            Index           =   2
+            Tag             =   "160"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.10 普通"
+            Index           =   3
+            Tag             =   "0"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.07 普通より滑る"
+            Index           =   4
+            Tag             =   "128"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.05 よく滑る"
+            Index           =   5
+            Tag             =   "96"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.02 すごく滑る"
+            Index           =   6
+            Tag             =   "64"
+         End
+         Begin VB.Menu mnuFriction 
+            Caption         =   "0.00 摩擦なし"
+            Index           =   7
+            Tag             =   "32"
+         End
+      End
+   End
 End
 Attribute VB_Name = "FormMapChip"
 Attribute VB_GlobalNameSpace = False
@@ -106,6 +180,7 @@ End Sub
 
 Private Sub Form_Load()
     cmbLevel.ListIndex = EditLevel
+    mnu.Visible = False
 End Sub
 
 Private Sub Form_Resize()
@@ -139,11 +214,22 @@ Private Sub hscX_Scroll()
     picChip_Paint
 End Sub
 
-Private Sub picChara_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub mnuFriction_Click(Index As Integer)
+    Dim O
+    For Each O In mnuFriction
+        O.Checked = O.Index = Index
+    Next
+End Sub
+
+Private Sub mnuHit_Click(Index As Integer)
+    mnuHit(Index).Checked = Not mnuHit(Index).Checked
+End Sub
+
+Private Sub picChara_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     Dim SX As Integer, SY As Integer
     Dim CX As Integer, CY As Integer
     SX = hscX.Value: SY = vscY.Value
-    CX = (x + SX) \ 32: CY = 15
+    CX = (X + SX) \ 32: CY = 15
     If CX < 16 And CY = 15 Then SelectedChip = CX + CY * 16
     picChara_Paint
     picChip_Paint
@@ -157,10 +243,10 @@ Private Sub picChara_Paint()
     CX = (SelectedChip Mod 16) * 32 - SX
     CY = (SelectedChip \ 16) * 32 - SY
     For I = 0 To 15
-        BitBlt picChara.hDC, I * 32 - SX, 0, 32, 32, Stages.GetMapChipDC(1), 0, 0, vbSrcCopy
+        BitBlt picChara.hdc, I * 32 - SX, 0, 32, 32, Stages.GetMapChipDC(1), 0, 0, vbSrcCopy
     Next
-    BitBlt picChara.hDC, 0, 0, 512 - SX, 32, MDIFormMain.picChara.hDC, SX, 32, vbSrcAnd
-    BitBlt picChara.hDC, 0, 0, 512 - SX, 32, MDIFormMain.picChara.hDC, SX, 0, vbSrcPaint
+    BitBlt picChara.hdc, 0, 0, 512 - SX, 32, MDIFormMain.picChara.hdc, SX, 32, vbSrcAnd
+    BitBlt picChara.hdc, 0, 0, 512 - SX, 32, MDIFormMain.picChara.hdc, SX, 0, vbSrcPaint
     picChara.Line (CX + 0, CY + 0 - 480)-(CX + 31, CY + 31 - 480), &HFFFFFF, B
     picChara.Line (CX + 1, CY + 1 - 480)-(CX + 30, CY + 30 - 480), &H0, B
     picChara.Line (CX + 2, CY + 2 - 480)-(CX + 29, CY + 29 - 480), &HFFFFFF, B
@@ -168,17 +254,18 @@ Private Sub picChara_Paint()
 End Sub
 
 Private Sub picChip_DblClick()
-    If EditLevel = 1 And SelectedChip < &HF0 Then Stages.EditHit SelectedChip
+    If EditLevel = 1 Then Stages.EditHit SelectedChip
 End Sub
 
-Private Sub picChip_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picChip_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     Dim SX As Integer, SY As Integer
     Dim CX As Integer, CY As Integer
     SX = hscX.Value: SY = vscY.Value
-    CX = (x + SX) \ 32: CY = (y + SY) \ 32
+    CX = (X + SX) \ 32: CY = (Y + SY) \ 32
     If CX < 16 And CY < 15 Then SelectedChip = CX + CY * 16
     picChip_Paint
     picChara_Paint
+    If Button = vbRightButton And EditLevel = 1 Then Stages.EditHit SelectedChip, True
 End Sub
 
 Private Sub picChip_Paint()
@@ -188,7 +275,7 @@ Private Sub picChip_Paint()
     CX = (SelectedChip Mod 16) * 32 - SX
     CY = (SelectedChip \ 16) * 32 - SY
     picChip.Cls
-    GIFBlt picChip.hDC, 0, 0, 512 - SX, 480 - SY, Stages.GetMapChipDC(EditLevel), SX, SY, Stages.GetMapChipMaskDC(EditLevel)
+    GIFBlt picChip.hdc, 0, 0, 512 - SX, 480 - SY, Stages.GetMapChipDC(EditLevel), SX, SY, Stages.GetMapChipMaskDC(EditLevel)
     picChip.Line (CX + 0, CY + 0)-(CX + 31, CY + 31), &HFFFFFF, B
     picChip.Line (CX + 1, CY + 1)-(CX + 30, CY + 30), &H0, B
     picChip.Line (CX + 2, CY + 2)-(CX + 29, CY + 29), &HFFFFFF, B

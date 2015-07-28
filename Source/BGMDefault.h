@@ -18,8 +18,6 @@ enum MIDINumber {
 	MIDI_RESET,
 	MIDI_PLAY,
 	MIDI_GEASPRIN,
-//	MIDI_SLEEP,
-//	MIDI_AWAKE,
 	MIDI_CLEAR,
 	MIDI_MISS,
 	MIDI_EXPLAIN,
@@ -37,7 +35,7 @@ protected:
 	int				m_MIDINo;
 public:
 	void Update();
-	void MusicEffect(MENumber no);
+	void MusicEffect(MENumber no, float param=0.0f);
 	bool Init();
 	string GetClassName();
 	CBGMDefault();

@@ -166,6 +166,10 @@ SOURCE=.\f3MapObjectWind.cpp
 # PROP Default_Filter "cpp"
 # Begin Source File
 
+SOURCE=.\ConfigScene.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ExplainScene.cpp
 # End Source File
 # Begin Source File
@@ -183,6 +187,14 @@ SOURCE=.\GameScene.cpp
 # Begin Source File
 
 SOURCE=.\ReplayScene.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ResultScene.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SettingScene.cpp
 # End Source File
 # Begin Source File
 
@@ -252,6 +264,10 @@ SOURCE=.\f3Setting.cpp
 # Begin Source File
 
 SOURCE=.\f3StageFile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\RandomReplay.cpp
 # End Source File
 # Begin Source File
 
@@ -540,6 +556,10 @@ SOURCE=.\BGMUser.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\ConfigScene.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\ControlCheckTool.h
 # End Source File
 # Begin Source File
@@ -668,6 +688,10 @@ SOURCE=.\GameTitle.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\RandomReplay.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\ReplayScene.h
 # End Source File
 # Begin Source File
@@ -676,7 +700,15 @@ SOURCE=.\ResourceManager.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\ResultScene.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\SceneBase.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SettingScene.h
 # End Source File
 # Begin Source File
 

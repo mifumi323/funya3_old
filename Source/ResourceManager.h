@@ -21,6 +21,7 @@ enum {
 	RID_MRFRAME,
 	RID_EFFECT,
 	RID_NAVI,
+	RID_HIT,
 
 	RID_END
 };

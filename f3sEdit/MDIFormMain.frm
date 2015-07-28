@@ -4,7 +4,7 @@ Begin VB.MDIForm MDIFormMain
    Caption         =   "ふにゃさんステージエディタ"
    ClientHeight    =   5340
    ClientLeft      =   165
-   ClientTop       =   855
+   ClientTop       =   735
    ClientWidth     =   7050
    Icon            =   "MDIFormMain.frx":0000
    LinkTopic       =   "MDIForm1"
@@ -161,6 +161,12 @@ Begin VB.MDIForm MDIFormMain
          Caption         =   "マップチップ"
       End
    End
+   Begin VB.Menu mnuOption 
+      Caption         =   "オプション"
+      Begin VB.Menu mnuOptionViewHit 
+         Caption         =   "テストプレイ時当たり判定を表示"
+      End
+   End
 End
 Attribute VB_Name = "MDIFormMain"
 Attribute VB_GlobalNameSpace = False
@@ -195,6 +201,10 @@ End Sub
 
 Private Sub mnuFileSave_Click()
     Stages.Save
+End Sub
+
+Private Sub mnuOptionViewHit_Click()
+    mnuOptionViewHit.Checked = Not mnuOptionViewHit.Checked
 End Sub
 
 Private Sub mnuViewInfo_Click()

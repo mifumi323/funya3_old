@@ -45,11 +45,6 @@ void Cf3MapObjectBanana::Synergy()
 	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_FUNYA); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-/*	Reaction(m_pParent->GetMainChara());
-	for(set<Cf3MapObjectmrframe*>::iterator it = Cf3MapObjectmrframe::IteratorBegin();it!=Cf3MapObjectmrframe::IteratorEnd();it++){
-		if ((*it)->IsValid())
-			Reaction((*it));
-	}*/
 }
 
 void Cf3MapObjectBanana::Reaction(Cf3MapObjectBase *obj)

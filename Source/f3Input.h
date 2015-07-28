@@ -47,6 +47,7 @@ public:
 
 private:
 	tagButtonState m_ButtonState[F3KEY_BUFSIZE];
+	static const int m_DefaultButton[F3KEY_BUFSIZE];
 	static const LPSTR m_KeyName[256];
 protected:
 	LRESULT SetButtonState(int button, bool state);

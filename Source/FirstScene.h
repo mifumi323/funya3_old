@@ -12,27 +12,27 @@
 #include "SceneBase.h"
 
 class Cf3Select;
-class Cf3Replay;
-class Cf3Map;
+//class Cf3Replay;
+//class Cf3Map;
 
 class CFirstScene : public CSceneBase  
 {
 protected:
 	Cf3Select			*m_Select;
 	Cf3NavigationBar	*m_NavigationBar;
+	int					m_nMenu;
 
 	CTextDIB32			*m_TextTitle;
 	CDIB32				*m_Icon;
 	TTextNavi			m_TextNavi;
 	TTextNavi			m_TextDemo;
 
-	vector<string>		m_ReplayList;
-	Cf3Replay			*m_pPlayer;
-	Cf3Map				*m_pMap;
-	int					m_Phase;
+//	vector<string>		m_ReplayList;
+//	Cf3Replay			*m_pPlayer;
+//	Cf3Map				*m_pMap;
+//	int					m_Phase;
 public:
-	void Replay(CDIB32 *lp);
-	void FindAllReplayFile();
+	void SetMenu(int no=0);
 	void OnDraw(CDIB32 *lp);
 	void OnInit();
 	CFirstScene();

@@ -497,12 +497,13 @@ Public Function GetStageNum(stg As clsStage) As Integer
     GetStageNum = -1
 End Function
 
-Public Sub EditHit(ByVal Chip As Byte)
-    If GetMapChipFile(1) = "" Then Exit Sub
+Public Sub EditHit(ByVal Chip As Byte, Optional UseMenu)
+    If Chip >= &HF0 Or GetMapChipFile(1) = "" Then Exit Sub
     Dim hf As String
     Dim B(239) As Byte
     hf = GetMapChipFile(1) & ".f3h"
     Dim I As Integer, N As Integer
+    Dim O As Object
     'ì«Ç›çûÇ›
     N = FreeFile
     If Dir(hf) = "" Then
@@ -525,11 +526,32 @@ Public Sub EditHit(ByVal Chip As Byte)
         Next
     Close
     'ï“èW
-    Load FormHit
-    FormHit.SetHit B(Chip)
-    FormHit.Show vbModal
-    B(Chip) = FormHit.Hit
-    Unload FormHit
+    If IsMissing(UseMenu) Then
+        Load FormHit
+        With FormHit
+            .SetHit B(Chip)
+            .Show vbModal
+            B(Chip) = .Hit
+        End With
+        Unload FormHit
+    Else
+        With FormMapChip
+            For Each O In .mnuHit
+                O.Checked = (B(Chip) And CByte(O.Tag)) <> 0
+            Next
+            For Each O In .mnuFriction
+                O.Checked = (B(Chip) And Not CByte(31)) = CByte(O.Tag)
+            Next
+            .PopupMenu .mnu
+            B(Chip) = 0
+            For Each O In .mnuHit
+                If O.Checked Then B(Chip) = B(Chip) Or CByte(O.Tag)
+            Next
+            For Each O In .mnuFriction
+                If O.Checked Then B(Chip) = B(Chip) Or CByte(O.Tag)
+            Next
+        End With
+    End If
     'èëÇ´èoÇµ
     Open hf For Output As #N
     Close

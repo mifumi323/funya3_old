@@ -62,6 +62,7 @@ public:
 	virtual ~CGameScene();
 
 	static bool	m_bTest;
+	static bool	m_bVisibleHit;
 	static int	m_nStage;
 
 protected:

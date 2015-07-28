@@ -21,6 +21,7 @@ protected:
 	int			m_Selected;
 	int			m_Prev;
 	int			m_Lines;
+	int			m_CursorY;
 	CTextDIB32	*m_Text;
 	CDIB32		*m_Cursor;
 	vector<int>	m_IDs;
@@ -28,9 +29,10 @@ public:
 	void Add(string item, int id);
 	void Add(string item) { Add(item, m_Lines); }
 	bool Changed() { return m_Prev!=m_Selected; }
-	void Select(int num);
+	void SelectPos(int num);
 	void GetSize(int &sx,int &sy);
 	int GetSelected() { return m_IDs[m_Selected]; }
+	int GetSelectedPos() { return m_Selected; }
 	void Clear();
 	void InnerOnDraw(CPlaneBase*lp);
 	Cf3Select();

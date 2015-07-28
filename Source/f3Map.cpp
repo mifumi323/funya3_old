@@ -21,6 +21,7 @@
 #include "f3MapObjectFire.h"
 #include "f3MapObjectEffect.h"
 #include "f3MapObjectWind.h"
+#include "ResourceManager.h"
 
 BYTE Cf3Map::m_defHit[240] = {
 	0x00,0x0f,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,
@@ -230,7 +231,7 @@ Cf3Map::~Cf3Map()
 	DELETE_SAFE(m_pDIBBuf);
 }
 
-void Cf3Map::OnDraw(CDIB32 *lp)
+void Cf3Map::OnDraw(CDIB32 *lp, bool bShowHit)
 {
 	int x,y,z;
 	int vx,vy;
@@ -262,6 +263,13 @@ void Cf3Map::OnDraw(CDIB32 *lp)
 		}
 	}
 	if (m_MapData[1]) {
+		CDIB32* pHit;
+		if (bShowHit) {
+			pHit = new CDIB32;
+			pHit->CreateSurface(384, 32);
+			pHit->BltFast(ResourceManager.Get(RID_HIT), 0, 0);
+			pHit->SubColorFast(theApp->random(0x1000000));
+		}
 		sx = sy = 0;
 		GetViewPos(sx,sy);
 		sx = (-sx)>>5; sy = (-sy)>>5;
@@ -279,7 +287,49 @@ void Cf3Map::OnDraw(CDIB32 *lp)
 				GetViewPos(vx,vy);
 				if (m_MapData[0]) lp->Blt(m_MapChip[1],vx,vy,&r);
 				else lp->BltFast(m_MapChip[1],vx,vy,&r);
+				if (bShowHit) {
+					// “–‚½‚è”»’è•\Ž¦
+					if (GetHit(x, y, HIT_TOP)) {
+						int f=m_Hit[GetMapData(1,x,y)]&~0x1f;
+						r.left = f;
+						r.top = 0;
+						r.right = f+32;
+						r.bottom = 32;
+						lp->BlendBlt(pHit, vx, vy, 0x808080, 0x7f7f7f, &r);
+					}
+					if (GetHit(x, y, HIT_BOTTOM)) {
+						r.left = 256;
+						r.top = 0;
+						r.right = 288;
+						r.bottom = 32;
+						lp->BlendBlt(pHit, vx, vy, 0x808080, 0x7f7f7f, &r);
+					}
+					if (GetHit(x, y, HIT_LEFT)) {
+						r.left = 288;
+						r.top = 0;
+						r.right = 320;
+						r.bottom = 32;
+						lp->BlendBlt(pHit, vx, vy, 0x808080, 0x7f7f7f, &r);
+					}
+					if (GetHit(x, y, HIT_RIGHT)) {
+						r.left = 320;
+						r.top = 0;
+						r.right = 352;
+						r.bottom = 32;
+						lp->BlendBlt(pHit, vx, vy, 0x808080, 0x7f7f7f, &r);
+					}
+					if (GetHit(x, y, HIT_DEATH)) {
+						r.left = 352;
+						r.top = 0;
+						r.right = 384;
+						r.bottom = 32;
+						lp->BlendBlt(pHit, vx, vy, 0x808080, 0x7f7f7f, &r);
+					}
+				}
 			}
+		}
+		if (bShowHit) {
+			delete pHit;
 		}
 	}
 	Cf3MapObjectBanana::OnDrawAll(lp);

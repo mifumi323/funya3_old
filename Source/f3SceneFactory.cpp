@@ -10,6 +10,8 @@
 #include "GameScene.h"
 #include "ReplayScene.h"
 #include "ExplainScene.h"
+#include "ConfigScene.h"
+#include "ResultScene.h"
 
 //////////////////////////////////////////////////////////////////////
 // \’z/Á–Å
@@ -34,6 +36,8 @@ CScene* Cf3SceneFactory::CreateScene(int nScene) {
 	case GAME_SCENE:	lp = new CGameScene; break;
 	case REPLAY_SCENE:	lp = new CReplayScene; break;
 	case EXPLAIN_SCENE:	lp = new CExplainScene; break;
+	case CONFIG_SCENE:	lp = new CConfigScene; break;
+	case RESULT_SCENE:	lp = new CResultScene; break;
 	default:			lp = NULL; // error..
 	}
 //	lp->SetOutClass(&outer);

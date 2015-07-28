@@ -10,6 +10,7 @@
 #include "f3MapObjectIce.h"
 #include "f3MapObjectIceSource.h"
 #include "f3MapObjectFire.h"
+#include "f3MapObjectBanana.h"
 #include "f3Map.h"
 #include "ResourceManager.h"
 #include "yaneSDK/yaneSinTable.h"
@@ -344,128 +345,23 @@ void Cf3MapObjectfff::Synergy()
 			m_PowerX = m_PowerY = 0.0f;
 		}
 	}
-/*	if (m_State==DEAD||m_State==SMILE) return;
-	m_Power = m_PowerX = m_PowerY = 0.0f;
-	// ギヤバネ
-	for(set<Cf3MapObjectGeasprin*>::iterator gs = Cf3MapObjectGeasprin::IteratorBegin();
-	gs!=Cf3MapObjectGeasprin::IteratorEnd();gs++){
-		if ((*gs)->IsValid()) {
-			float objX, objY;
-			(*gs)->GetPos(objX,objY);
-			if (!(*gs)->IsFrozen()) {
-				if (IsIn(objX-16,m_X,objX+15)) {
-					if (IsIn(objY-30,m_Y,objY+16)) {
-						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_DY=-10;
-					}
-				}ef(IsIn(objX+16,m_X,objX+29)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_DX=10;
-					}
-				}ef(IsIn(objX-29,m_X,objX-16)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_DX=-10;
-					}
-				}
-			}else{
-				if (IsIn(objX-16,m_X,objX+15)) {
-					if (IsIn(objY-30,m_Y,objY)&&m_DY>=0) {
-						m_Y = objY-30;
-						m_DY=0;
-					}
-				}ef(IsIn(objX+16,m_X,objX+29)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						m_X = objX+30;
-						m_DX=0;
-					}
-				}ef(IsIn(objX-29,m_X,objX-16)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						m_X = objX-30;
-						m_DX=-0;
-					}
-				}
+	// バナナ(BGMの調整用)
+	if (m_pParent->GetMainChara()==this) {
+		float bd, bananaDistance = 1e10;
+		int nBanana=0, nPosition=0;
+		int cx, cy;
+		for(set<Cf3MapObjectBanana*>::iterator bn = Cf3MapObjectBanana::IteratorBegin();bn!=Cf3MapObjectBanana::IteratorEnd();bn++){
+			if ((*bn)->IsValid()) {
+				(*bn)->GetCPos(cx, cy);
+				bd = (cx*32+16-m_X)*(cx*32+16-m_X)+(cy*32+16-m_Y)*(cy*32+16-m_Y);
+				if (bd<bananaDistance) bananaDistance=bd;
+				nBanana++;
+				nPosition += cx-m_nCX;
 			}
 		}
+		theApp->GetBGM()->MusicEffect(MEN_BANANADISTANCE, bananaDistance);
+		theApp->GetBGM()->MusicEffect(MEN_BANANAPOSITION, nBanana?(float)nPosition/nBanana:0.0f);
 	}
-	// とげとげ
-	for(set<Cf3MapObjectNeedle*>::iterator nd = Cf3MapObjectNeedle::IteratorBegin();
-	nd!=Cf3MapObjectNeedle::IteratorEnd();nd++){
-		if ((*nd)->IsValid()) {
-			float objX, objY;
-			(*nd)->GetPos(objX,objY);
-			if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-				Die();
-				return;
-			}
-		}
-	}
-	// ウナギカズラ
-	for(set<Cf3MapObjectEelPitcher*>::iterator ep = Cf3MapObjectEelPitcher::IteratorBegin();
-	ep!=Cf3MapObjectEelPitcher::IteratorEnd();ep++){
-		if ((*ep)->IsValid()&&(*ep)->IsLeaf()) {
-			float objX, objY;
-			(*ep)->GetPos(objX,objY);
-			if (IsIn(objX-16,m_X,objX+16)) {
-				if (IsIn(objY-14,m_Y,objY)) {
-					if (m_DY>=0) {
-						m_Y = objY-14;
-						m_DY=0;
-					}
-				}
-			}
-		}
-	}
-	if (m_State!=FROZEN) {
-		// 氷
-		for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
-		ic!=Cf3MapObjectIce::IteratorEnd();ic++){
-			if ((*ic)->IsValid()&&(*ic)->GetSize()>10) {
-				float objX, objY;
-				(*ic)->GetPos(objX,objY);
-				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-					// あたった！
-					Freeze((*ic)->GetSize());
-				}
-			}
-		}
-		// 氷ゾーン
-		for(set<Cf3MapObjectIceSource*>::iterator is = Cf3MapObjectIceSource::IteratorBegin();
-		is!=Cf3MapObjectIceSource::IteratorEnd();is++){
-			float objX, objY;
-			(*is)->GetPos(objX,objY);
-			float dX = objX-m_X, dY = objY-m_Y,
-				p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
-			m_Power += p;
-			m_PowerX+= dX*p3;
-			m_PowerY+= dY*p3;
-		}
-		// 炎ゾーン
-		for(set<Cf3MapObjectFire*>::iterator fr = Cf3MapObjectFire::IteratorBegin();
-		fr!=Cf3MapObjectFire::IteratorEnd();fr++){
-			if ((*fr)->IsActive()) {
-				float objX, objY;
-				(*fr)->GetPos(objX,objY);
-				float dX = objX-m_X, dY = objY-m_Y,
-					p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
-				m_Power -= p;
-				m_PowerX-= dX*p3;
-				m_PowerY-= dY*p3;
-			}
-		}
-		if (m_Power>1.0f/256.0f) {
-			Freeze();
-		}ef(m_Power>1.0f/4096.0f) {
-			m_nPower=4;
-			m_PowerX = m_PowerY = 0.0f;
-		}ef(m_Power<-1.0f/256.0f) {
-			Die();
-		}ef(m_Power<-1.0f/4096.0f) {
-		}else{
-			m_PowerX = m_PowerY = 0.0f;
-		}
-	}*/
 }
 
 void Cf3MapObjectfff::Freeze(int level)

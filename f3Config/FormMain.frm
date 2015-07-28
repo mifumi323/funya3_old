@@ -98,9 +98,9 @@ Begin VB.Form FormMain
       Caption         =   "リプレイデータ"
       Height          =   2895
       Index           =   40
-      Left            =   4920
+      Left            =   3480
       TabIndex        =   29
-      Top             =   3360
+      Top             =   1440
       Width           =   3735
       Begin VB.FileListBox filReplay 
          Height          =   270
@@ -196,12 +196,20 @@ Begin VB.Form FormMain
    End
    Begin VB.Frame fraCategory 
       Caption         =   "全般"
-      Height          =   3855
+      Height          =   4335
       Index           =   0
       Left            =   1920
       TabIndex        =   2
       Top             =   0
       Width           =   3015
+      Begin VB.CheckBox chkBackground 
+         Caption         =   "非アクティブでも動作させる"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   43
+         Top             =   960
+         Width           =   2535
+      End
       Begin VB.ComboBox cmbTime 
          Height          =   300
          ItemData        =   "FormMain.frx":0442
@@ -209,7 +217,7 @@ Begin VB.Form FormMain
          List            =   "FormMain.frx":0452
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   42
-         Top             =   1680
+         Top             =   2040
          Width           =   1455
       End
       Begin VB.CheckBox chkHyper 
@@ -217,7 +225,7 @@ Begin VB.Form FormMain
          Height          =   255
          Left            =   120
          TabIndex        =   24
-         Top             =   3480
+         Top             =   3840
          Visible         =   0   'False
          Width           =   1455
       End
@@ -228,7 +236,7 @@ Begin VB.Form FormMain
          List            =   "FormMain.frx":04C2
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   23
-         Top             =   3120
+         Top             =   3480
          Visible         =   0   'False
          Width           =   1455
       End
@@ -240,7 +248,7 @@ Begin VB.Form FormMain
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   22
          ToolTipText     =   "ミスターフレーム"
-         Top             =   960
+         Top             =   1320
          Visible         =   0   'False
          Width           =   615
       End
@@ -252,7 +260,7 @@ Begin VB.Form FormMain
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   21
          ToolTipText     =   "あんこ"
-         Top             =   960
+         Top             =   1320
          Visible         =   0   'False
          Width           =   615
       End
@@ -264,7 +272,7 @@ Begin VB.Form FormMain
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   20
          ToolTipText     =   "サングラス"
-         Top             =   960
+         Top             =   1320
          Width           =   615
       End
       Begin VB.OptionButton optChara 
@@ -275,7 +283,7 @@ Begin VB.Form FormMain
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   19
          ToolTipText     =   "ふにゃ"
-         Top             =   960
+         Top             =   1320
          Value           =   -1  'True
          Width           =   615
       End
@@ -286,7 +294,7 @@ Begin VB.Form FormMain
          List            =   "FormMain.frx":08F9
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   18
-         Top             =   2760
+         Top             =   3120
          Visible         =   0   'False
          Width           =   1455
       End
@@ -295,7 +303,7 @@ Begin VB.Form FormMain
          Height          =   255
          Left            =   120
          TabIndex        =   17
-         Top             =   2400
+         Top             =   2760
          Visible         =   0   'False
          Width           =   1455
       End
@@ -306,7 +314,7 @@ Begin VB.Form FormMain
          List            =   "FormMain.frx":0942
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   16
-         Top             =   2040
+         Top             =   2400
          Visible         =   0   'False
          Width           =   1455
       End
@@ -387,7 +395,9 @@ Begin VB.Form FormMain
    End
    Begin VB.ListBox lstCategory 
       Height          =   2220
+      ItemData        =   "FormMain.frx":09BD
       Left            =   120
+      List            =   "FormMain.frx":09BF
       TabIndex        =   0
       Top             =   120
       Width           =   1695
@@ -733,6 +743,10 @@ Public Sub f3LoadSetting()
                     l.GetNum I
                     chkFullScreen.Value = -(I <> 0)
                 
+                ElseIf l.IsMatch("BACKGROUND") Then
+                    l.GetNum I
+                    chkBackground.Value = -(I <> 0)
+                
                 ElseIf l.IsMatch("CHARACTER") Then
                     l.GetNum I
                     optChara(I).Value = True
@@ -879,6 +893,7 @@ Public Sub f3SaveSetting()
     Open GetFullFileName(SettingFile) For Output As #N
         Print #N, "BGM" & " " & cmbBGMMode.ListIndex
         Print #N, "FULLSCREEN" & " " & chkFullScreen.Value
+        Print #N, "BACKGROUND" & " " & chkBackground.Value
         Print #N, "CHARACTER" & " " & TrueOption(optChara)
         Print #N, "VIEWTIME" & " " & cmbTime.ListIndex
         Print #N, "RECORDCLEAR" & " " & hscRecordClear.Value

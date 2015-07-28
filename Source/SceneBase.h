@@ -9,8 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "YANESDK\yaneScene.h"
-#include "YANESDK\yaneDIB32.h"
+#include "YANESDK/yaneScene.h"
 #include "f3NavigationBar.h"
 //#include "App.h"
 
@@ -21,6 +20,8 @@ enum SCENE {
 	GAME_SCENE,
 	REPLAY_SCENE,
 	EXPLAIN_SCENE,
+	CONFIG_SCENE,
+	RESULT_SCENE,
 };
 
 class CSceneBase : 

@@ -5,7 +5,6 @@
 #include "App.h"
 #include "yaneSDK/yaneAppInitializer.h"
 #include "yaneSDK/yaneSingleApp.h"
-#include "yaneSDK/yaneFPSTimer.h"
 #include "yaneSDK/yaneFPSLayer.h"
 #include "yaneSDK/yaneLineParser.h"
 #include "yaneSDK/yaneTextDIB32.h"
@@ -29,6 +28,8 @@ CApp::CApp(){
 	m_BGM = NULL;
 	m_BGMMode = BGMM_NONE;
 	m_AVI = NULL;
+	m_FPS = NULL;
+	m_AutoDraw = true;
 	m_Rand.Randomize();
 	theApp = this;
 }
@@ -36,6 +37,7 @@ CApp::CApp(){
 CApp::~CApp(){
 	DELETE_SAFE(m_BGM);
 	DELETE_SAFE(m_AVI);
+	DELETE_SAFE(m_FPS);
 }
 
 //	これがmain windowのためのクラス。
@@ -105,6 +107,7 @@ void CApp::MainThread(){
 			l.GetStr(m_StageFileName);
 			m_StageFileName += ".f3s";
 			l.GetNum(CGameScene::m_nStage);
+			CGameScene::m_bVisibleHit = l.IsMatch("VISIBLEHIT");
 		}ef(l.IsMatch("REPLAY")) {
 			scene = REPLAY_SCENE;
 			l.GetStr(m_StageFileName);
@@ -120,7 +123,8 @@ void CApp::MainThread(){
 	sc.JumpScene(scene);
 
 	// 準備完了まで著作権表示
-	GetDraw()->SetDisplay(m_Setting.m_FullScreen!=0,320,240);
+	m_Backup.CreateSurface(320, 240);
+	SetFullScreen(m_Setting.m_FullScreen!=0);
 	{
 		CTextDIB32 tx;
 		int w,h;
@@ -130,11 +134,11 @@ void CApp::MainThread(){
 		tx.GetFont()->SetBackColor(0x303030);
 		tx.UpdateText();
 		tx.GetSize(w,h);
-		GetDraw()->Blt(&tx,160-w/2,120-h/2);
-		GetDraw()->OnDraw(NULL,false);
+		GetDIB()->Blt(&tx,160-w/2,120-h/2);
+		m_Draw.OnDraw(NULL,false);
 	}
 	// で、準備
-	CFPSTimer t;
+	CFPSTimer& t = *(m_FPS = new CFPSTimer);
 	CFPSLayer l(&t);
 	t.SetFPS((m_Setting.m_TimeMaster&&m_Setting.m_FPS)?m_Setting.m_FPS:40);
 	m_BGM = new CBGMBase;
@@ -146,20 +150,25 @@ void CApp::MainThread(){
 	ResourceManager.Init();
 
 	while (IsThreadValid()) {
-		f3Input.Input();
-		if (GetForegroundWindow()==GetMyApp()->GetHWnd()) {
+		if (m_Setting.m_Background||GetForegroundWindow()==GetMyApp()->GetHWnd()) {
+			if (m_Setting.m_Background>=2||GetForegroundWindow()==GetMyApp()->GetHWnd())
+				f3Input.Input();
 			if (f3Input.GetKeyPushed(F3KEY_EXIT)) break;
 			// BGMの操作
-			if (f3Input.GetKeyPushed(F3KEY_BGMNONE)) ChangeBGM(BGMM_NONE);
-			if (f3Input.GetKeyPushed(F3KEY_BGMDEF)) ChangeBGM(BGMM_DEFAULT);
-			if (f3Input.GetKeyPushed(F3KEY_BGMUSER)) ChangeBGM(BGMM_USER);
+			if (m_AutoDraw) {
+				if (f3Input.GetKeyPushed(F3KEY_BGMNONE)) ChangeBGM(BGMM_NONE);
+				if (f3Input.GetKeyPushed(F3KEY_BGMDEF)) ChangeBGM(BGMM_DEFAULT);
+				if (f3Input.GetKeyPushed(F3KEY_BGMUSER)) ChangeBGM(BGMM_USER);
+			}
 			m_BGM->Update();
 			// CPlaneBaseじゃなくてCDIB32を使って呼び出す(これでCDIB32の全ての機能が使える)
-			if (sc.OnDraw(GetDraw()->GetSecondary())) break;
-			l.Enable(f3Input.GetKeyPressed(F3KEY_FPS));
-			GetDraw()->OnDraw();
-			if (f3Input.GetKeyPushed(F3KEY_CAPTURE)) ScreenCapture();
-			if (m_AVI) m_AVI->Write(GetDraw()->GetSecondary());
+			if (sc.OnDraw(GetDIB())) break;
+			if (m_AutoDraw) {
+				l.Enable(f3Input.GetKeyPressed(F3KEY_FPS));
+				m_Draw.OnDraw();
+				if (f3Input.GetKeyPushed(F3KEY_CAPTURE)) ScreenCapture();
+				if (m_AVI) m_AVI->Write(GetDIB());
+			}
 		}
 		t.WaitFrame();
 	}
@@ -200,7 +209,7 @@ void CApp::ChangeBGM(BGMMode no)
 void CApp::ScreenCapture()
 {
 	string filename;
-	if (MakeFileName(filename, "bmp")) GetDraw()->GetSecondary()->Save(filename);
+	if (MakeFileName(filename, "bmp")) GetDIB()->Save(filename);
 }
 
 bool CApp::MakeFileName(string &filename, LPCSTR ext, int max, bool bForceToMake)
@@ -246,4 +255,9 @@ void CApp::AVIRecordingStart()
 void CApp::AVIRecordingStop()
 {
 	DELETE_SAFE(m_AVI);
+}
+
+void CApp::SetFullScreen(bool bFS)
+{
+	m_Draw.SetDisplay(bFS, 320*(theSetting->m_Zoom+1), 240*(theSetting->m_Zoom+1));
 }

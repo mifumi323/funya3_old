@@ -61,5 +61,5 @@ Public Sub TestPlay(ByVal num As Integer)
     If MsgBox("ステージをセーブした後テストプレイを始めます。", vbOKCancel) = vbCancel Then Exit Sub
     Stages.Save
     If Stages.GetFileName = "" Then Exit Sub
-    Shell "funya3.exe TEST """ & Stages.GetFileName & """ " & num, vbNormalFocus
+    Shell "funya3.exe TEST """ & Stages.GetFileName & """ " & num & IIf(MDIFormMain.mnuOptionViewHit.Checked, " VISIBLEHIT", ""), vbNormalFocus
 End Sub

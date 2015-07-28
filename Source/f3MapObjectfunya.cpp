@@ -10,6 +10,7 @@
 #include "f3MapObjectIce.h"
 #include "f3MapObjectIceSource.h"
 #include "f3MapObjectFire.h"
+#include "f3MapObjectBanana.h"
 #include "f3Map.h"
 #include "ResourceManager.h"
 
@@ -30,6 +31,7 @@ const float ADDGRAVITY = 4.0f;
 const float JUMPFRICTIONX = 0.026f;
 const float JUMPFRICTIONY = 0.10f;
 const float WINDFACTOR = 0.10f;
+const float MAXDISTANCE = 1.6e5f;
 
 #define SIN15	0.25881904510252076234889883762405f
 #define SIN30	0.5f
@@ -48,14 +50,6 @@ const float WINDFACTOR = 0.10f;
 
 Cf3MapObjectfunya::Cf3MapObjectfunya(int nCX, int nCY)
 {
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/funya.gif");
-		m_Graphic2.Load("resource/funya.gif");
-		m_Graphic2.AddColorFast(DIB32RGB(0,32,32));
-		m_Graphic2.SubColorFast(DIB32RGB(64,0,0));
-		m_Graphic2.SetColorKey(0,0);
-		m_bGraphicInitialize = true;
-	}*/
 	m_Graphic = ResourceManager.Get(RID_MAIN);
 	m_Graphic2 = ResourceManager.Get(RID_MAINICY);
 	SetID(OID_FUNYA);
@@ -72,6 +66,7 @@ Cf3MapObjectfunya::Cf3MapObjectfunya(int nCX, int nCY)
 	m_bOriginal = true;
 	m_bFirst = true;
 	m_PoseCounter2=0;
+	m_BananaDistance = 0.0f;
 }
 
 Cf3MapObjectfunya::~Cf3MapObjectfunya()
@@ -121,7 +116,7 @@ void Cf3MapObjectfunya::OnDraw(CDIB32 *lp)
 		if (m_Power<-1.0f/4096.0f) CX += 2;
 		CY = 0;
 	}ef(m_State==BLINKING) {
-		CX = 1;
+		CX = m_BananaDistance<MAXDISTANCE?1:30;
 		if (m_pInput->GetKeyPressed(F3KEY_SMILE)) CX = 18;
 	}
 	// あせあせ
@@ -574,134 +569,25 @@ void Cf3MapObjectfunya::Synergy()
 			m_PowerX = m_PowerY = 0.0f;
 		}
 	}
+	// バナナ(BGMの調整用)
+	if (m_pParent->GetMainChara()==this) {
+		m_BananaDistance = MAXDISTANCE;
+		float bd;
+		int nBanana=0, nPosition=0;
+		int cx, cy;
+		for(set<Cf3MapObjectBanana*>::iterator bn = Cf3MapObjectBanana::IteratorBegin();bn!=Cf3MapObjectBanana::IteratorEnd();bn++){
+			if ((*bn)->IsValid()) {
+				(*bn)->GetCPos(cx, cy);
+				bd = (cx*32+16-m_X)*(cx*32+16-m_X)+(cy*32+16-m_Y)*(cy*32+16-m_Y);
+				if (bd<m_BananaDistance) m_BananaDistance=bd;
+				nBanana++;
+				nPosition += cx-m_nCX;
+			}
+		}
+		theApp->GetBGM()->MusicEffect(MEN_BANANADISTANCE, m_BananaDistance);
+		theApp->GetBGM()->MusicEffect(MEN_BANANAPOSITION, nBanana?(float)nPosition/nBanana:0.0f);
+	}
 	if (m_OnEnemy) HitCheck();
-/*	if (m_State==DEAD||m_State==SMILING) return;
-	m_OnEnemy = false;
-	m_Power = m_PowerX = m_PowerY = 0.0f;
-	// ギヤバネ
-	for(set<Cf3MapObjectGeasprin*>::iterator gs = Cf3MapObjectGeasprin::IteratorBegin();
-	gs!=Cf3MapObjectGeasprin::IteratorEnd();gs++){
-		if ((*gs)->IsValid()) {
-			float objX, objY;
-			(*gs)->GetPos(objX,objY);
-			if (!(*gs)->IsFrozen()) {
-				if (IsIn(objX-16,m_X,objX+15)) {
-					if (IsIn(objY-30,m_Y,objY+16)) {
-						if (m_bOriginal) theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_Y--;
-						HighJump();
-					}
-				}ef(IsIn(objX+16,m_X,objX+29)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						if (m_bOriginal) theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_DX=10;
-					}
-				}ef(IsIn(objX-29,m_X,objX-16)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						if (m_bOriginal) theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
-						m_DX=-10;
-					}
-				}
-			}else{
-				if (IsIn(objX-16,m_X,objX+15)) {
-					if (IsIn(objY-30,m_Y,objY)&&m_DY>=0) {
-						m_OnEnemy = true;
-						m_Y = objY-30;
-						if (m_State==JUMPING) Land();
-					}
-				}ef(IsIn(objX+16,m_X,objX+29)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						m_X = objX+30;
-						m_DX=0;
-					}
-				}ef(IsIn(objX-29,m_X,objX-16)) {
-					if (IsIn(objY-16,m_Y,objY+15)) {
-						m_X = objX-30;
-						m_DX=-0;
-					}
-				}
-			}
-		}
-	}
-	// とげとげ
-	for(set<Cf3MapObjectNeedle*>::iterator nd = Cf3MapObjectNeedle::IteratorBegin();
-	nd!=Cf3MapObjectNeedle::IteratorEnd();nd++){
-		if ((*nd)->IsValid()) {
-			float objX, objY;
-			(*nd)->GetPos(objX,objY);
-			if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-				Die();
-				return;
-			}
-		}
-	}
-	// ウナギカズラ
-	for(set<Cf3MapObjectEelPitcher*>::iterator ep = Cf3MapObjectEelPitcher::IteratorBegin();
-	ep!=Cf3MapObjectEelPitcher::IteratorEnd();ep++){
-		if ((*ep)->IsValid()&&(*ep)->IsLeaf()) {
-			float objX, objY;
-			(*ep)->GetPos(objX,objY);
-			if (IsIn(objX-16,m_X,objX+16)) {
-				if (IsIn(objY-14,m_Y,objY)) {
-					if (m_DY>=0) {
-						m_OnEnemy = true;
-						m_Y = objY-14;
-						if (m_State==JUMPING) Land();
-					}
-				}
-			}
-		}
-	}
-	if (m_State!=FROZEN) {
-		// 氷
-		for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
-		ic!=Cf3MapObjectIce::IteratorEnd();ic++){
-			if ((*ic)->IsValid()&&(*ic)->GetSize()>10) {
-				float objX, objY;
-				(*ic)->GetPos(objX,objY);
-				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-					// あたった！
-					Freeze((*ic)->GetSize());
-				}
-			}
-		}
-		// 氷ゾーン
-		for(set<Cf3MapObjectIceSource*>::iterator is = Cf3MapObjectIceSource::IteratorBegin();
-		is!=Cf3MapObjectIceSource::IteratorEnd();is++){
-			float objX, objY;
-			(*is)->GetPos(objX,objY);
-			float dX = objX-m_X, dY = objY-m_Y,
-				p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
-			m_Power += p;
-			m_PowerX+= dX*p3;
-			m_PowerY+= dY*p3;
-		}
-		// 炎ゾーン
-		for(set<Cf3MapObjectFire*>::iterator fr = Cf3MapObjectFire::IteratorBegin();
-		fr!=Cf3MapObjectFire::IteratorEnd();fr++){
-			if ((*fr)->IsActive()) {
-				float objX, objY;
-				(*fr)->GetPos(objX,objY);
-				float dX = objX-m_X, dY = objY-m_Y,
-					p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
-				m_Power -= p;
-				m_PowerX-= dX*p3;
-				m_PowerY-= dY*p3;
-			}
-		}
-		if (m_Power>1.0f/256.0f) {
-			Freeze();
-		}ef(m_Power>1.0f/4096.0f) {
-			m_nPower=4;
-			m_PowerX = m_PowerY = 0.0f;
-		}ef(m_Power<-1.0f/256.0f) {
-			Die();
-		}ef(m_Power<-1.0f/4096.0f) {
-		}else{
-			m_PowerX = m_PowerY = 0.0f;
-		}
-	}
-	if (m_OnEnemy) HitCheck();*/
 }
 
 void Cf3MapObjectfunya::GetViewPos(int &vx, int &vy)
@@ -751,7 +637,7 @@ bool Cf3MapObjectfunya::IsDied()
 void Cf3MapObjectfunya::Blink()
 {
 	m_State = BLINKING;
-	m_PoseCounter = 2;
+	m_PoseCounter = m_BananaDistance<MAXDISTANCE?2:12;
 }
 
 void Cf3MapObjectfunya::Sleep()

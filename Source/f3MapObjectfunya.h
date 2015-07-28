@@ -39,9 +39,9 @@ protected:
 	void Jump();
 	CDIB32* m_Graphic;
 	CDIB32* m_Graphic2;
-//	static bool			m_bGraphicInitialize;
 
 	float m_DX, m_DY;							// 位置などの情報
+	float m_BananaDistance;
 	float m_ChargePower;						// ジャンプチャージ係数(1.0f=100%から減ってゆく)
 	float m_ChargeDec;							// ジャンプチャージ係数減衰値(設定で変化する予定)
 	static const f3JumpFunction m_JumpFunc[4];	// チャージ－ジャンプ力対応

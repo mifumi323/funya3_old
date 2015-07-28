@@ -7,9 +7,27 @@
 
 Cf3Input f3Input;
 
+const int Cf3Input::m_DefaultButton[F3KEY_BUFSIZE] = {
+	VK_ESCAPE,	// F3KEY_EXIT
+	VK_RETURN,	// F3KEY_PAUSE
+	VK_UP,		// F3KEY_UP
+	VK_LEFT,	// F3KEY_LEFT
+	VK_RIGHT,	// F3KEY_RIGHT
+	VK_DOWN,	// F3KEY_DOWN
+	'Z',		// F3KEY_JUMP
+	'X',		// F3KEY_ATTACK
+	0,			// F3KEY_SMILE
+	'F',		// F3KEY_FPS
+	'1',		// F3KEY_BGMNONE
+	'2',		// F3KEY_BGMDEF
+	'3',		// F3KEY_BGMUSER
+	'C',		// F3KEY_CAPTURE
+	0,			// F3KEY_RECORD
+};
+
 const LPSTR Cf3Input::m_KeyName[256] = {
 	// 00
-	"?",			"?",			"?",			"?",
+	"‚È‚µ",			"?",			"?",			"?",
 	"?",			"?",			"?",			"?",
 	"BackSpace",	"Tab",			"?",			"?",
 	"Clear",		"Enter",		"?",			"?",
@@ -107,23 +125,7 @@ void Cf3Input::Input()
 
 void Cf3Input::Init(int *key)
 {
-	int def[F3KEY_BUFSIZE] = {0};
-	def[F3KEY_EXIT]		= VK_ESCAPE;
-	def[F3KEY_PAUSE]	= VK_RETURN;
-	def[F3KEY_UP]		= VK_UP;
-	def[F3KEY_LEFT]		= VK_LEFT;
-	def[F3KEY_RIGHT]	= VK_RIGHT;
-	def[F3KEY_DOWN]		= VK_DOWN;
-	def[F3KEY_JUMP]		= 'Z';
-	def[F3KEY_ATTACK]	= 'X';
-	def[F3KEY_SMILE]	= 0;
-	def[F3KEY_FPS]		= 'F';
-	def[F3KEY_BGMNONE]	= '1';
-	def[F3KEY_BGMDEF]	= '2';
-	def[F3KEY_BGMUSER]	= '3';
-	def[F3KEY_CAPTURE]	= 'C';
-	def[F3KEY_RECORD]	= 0;
 	for (int i=0; i<F3KEY_BUFSIZE; i++) {
-		m_ButtonState[i].Button = key[i]?key[i]:def[i];
+		m_ButtonState[i].Button = key[i]?key[i]:m_DefaultButton[i];
 	}
 }

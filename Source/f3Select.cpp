@@ -19,6 +19,7 @@ Cf3Select::Cf3Select()
 	m_Text->GetFont()->SetColor(0xffffff);
 	m_Text->GetFont()->SetBackColor(0x303030);
 	m_Cursor = ResourceManager.Get(RID_MAIN);
+	m_CursorY = 0;
 	Clear();
 }
 
@@ -39,7 +40,9 @@ void Cf3Select::InnerOnDraw(CPlaneBase *lp)
 		}
 		lp->Blt(m_Text,m_nX, m_nY);
 		RECT rc = { 288, 96, 320, 128 };
-		lp->Blt(m_Cursor,m_nX-32, m_nY+32*m_Selected,&rc);
+		//BringClose(m_CursorY, 32*m_Selected, 8);
+		m_CursorY = (m_CursorY+32*m_Selected)/2;
+		lp->Blt(m_Cursor,m_nX-32, m_nY+m_CursorY,&rc);
 	}
 }
 
@@ -61,9 +64,13 @@ void Cf3Select::GetSize(int &sx, int &sy)
 	}
 }
 
-void Cf3Select::Select(int num)
+void Cf3Select::SelectPos(int num)
 {
-	if (num<m_Lines) m_Selected = num;
+	if (num<m_Lines) {
+		m_Selected = num;
+	}else {
+		m_Selected = m_Lines-1;
+	}
 }
 
 void Cf3Select::Add(string item, int id)

@@ -8,8 +8,11 @@
 #include "yaneSDK/yaneDir.h"
 #include "yaneSDK/yaneLineParser.h"
 
+// 普通の設定項目
 static char SS_BGM[] =			"BGM";
 static char SS_FULLSCREEN[] =	"FULLSCREEN";
+static char SS_ZOOM[] =			"ZOOM";
+static char SS_BACKGROUND[] =	"BACKGROUND";
 static char SS_CHARACTER[] =	"CHARACTER";
 static char SS_VIEWTIME[] =		"VIEWTIME";
 static char SS_FPS[] =			"FPS";
@@ -18,6 +21,8 @@ static char SS_GRAVITY[] =		"GRAVITY";
 static char SS_RECORDCLEAR[] =	"RECORDCLEAR";
 static char SS_RECORDMISS[] =	"RECORDMISS";
 static char SS_RECORDNUMBER[] =	"RECORDNUMBER";
+
+// プレイ記録
 static char SS_BANANA[] =		"BANANA";
 static char SS_PLAYTIME[] =		"PLAYTIME";
 static char SS_SLEEPTIME[] =	"SLEEPTIME";
@@ -32,6 +37,8 @@ static char SS_OUTLINE[] =		"OUTLINE";
 static char SS_COLDMAN[] =		"COLDMAN";
 static char SS_HYPER[] =		"HYPER";
 static char SS_ANDBALLOON[] =	"ANDBALLOON";
+
+// キー設定
 static char SS_KEY_EXIT[] =		"KEY_EXIT";
 static char SS_KEY_PAUSE[] =	"KEY_PAUSE";
 static char SS_KEY_UP[] =		"KEY_UP";
@@ -47,8 +54,11 @@ static char SS_KEY_BGMDEF[] =	"KEY_BGMDEF";
 static char SS_KEY_BGMUSER[] =	"KEY_BGMUSER";
 static char SS_KEY_CAPTURE[] =	"KEY_CAPTURE";
 static char SS_KEY_RECORD[] =	"KEY_RECORD";
+
+// その他
 static char SS_PROGRESS[] =		"PROGRESS";
 static char SS_CHECKSUM[] =		"CHECKSUM";
+
 
 Cf3Setting* theSetting;
 
@@ -62,6 +72,8 @@ Cf3Setting::Cf3Setting()
 	tagSetting DefSetting[] = {
 		{ SS_BGM,			&m_BGMMode,				false},
 		{ SS_FULLSCREEN,	&m_FullScreen,			false},
+		{ SS_ZOOM,			&m_Zoom,				false},
+		{ SS_BACKGROUND,	&m_Background,			false},
 		{ SS_CHARACTER,		&m_Character,			false},
 		{ SS_VIEWTIME,		&m_ViewTime,			false},
 		{ SS_FPS,			&m_FPS,					false},

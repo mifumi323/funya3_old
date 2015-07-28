@@ -135,21 +135,27 @@ LRESULT CBGMDefault::Load(int no, string filename, bool secondary, DWORD start, 
 	return 0;
 }
 
-void CBGMDefault::MusicEffect(MENumber no)
+void CBGMDefault::MusicEffect(MENumber no, float param)
 {
 	switch (no) {
 	case MEN_SLEEP: {
-//		if (m_pMIDI[MIDI_SLEEP]) m_pMIDI[MIDI_SLEEP]->Play();
 		for (int i=0; i<16; i++) m_pFader->FadeExpression(i, i==15?100:0, 1);
 		break;
 					  }
 	case MEN_AWAKE: {
-//		if (m_pMIDI[MIDI_AWAKE]) m_pMIDI[MIDI_AWAKE]->Play();
 		for (int i=0; i<16; i++) m_pFader->FadeExpression(i, i!=15?100:0, 1);
 		break;
 					  }
 	case MEN_GEASPRIN: {
 		if (m_pMIDI[MIDI_GEASPRIN]) m_pMIDI[MIDI_GEASPRIN]->Play();
+		break;
+					  }
+	case MEN_BANANADISTANCE: {
+		m_pFader->FadeVolume(5, 90+20*exp(-param*5e-5f), 1);
+		break;
+					  }
+	case MEN_BANANAPOSITION: {
+		m_pFader->FadePan(5, 64+atan(param*0.1f)*(100/3.14159265358979), 1);
 		break;
 					  }
 	}

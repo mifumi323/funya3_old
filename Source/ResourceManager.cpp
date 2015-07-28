@@ -32,4 +32,5 @@ void CResourceManager::Init()
 	m_Resource[RID_MRFRAME].Load("resource/mrframe.gif");
 	m_Resource[RID_EFFECT].Load("resource/Stars.gif");
 	m_Resource[RID_NAVI].Load("resource/Navi.gif");
+	m_Resource[RID_HIT].Load("resource/Hit.bmp");
 }
