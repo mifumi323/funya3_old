@@ -28,9 +28,9 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 }
 
 // データを取得。なければNULL
-F3SEDITDLL_API BYTE* __stdcall GetStageData(BYTE *lpData, DWORD dwDataSize, DWORD dwType, DWORD *dwSize)
+F3SEDITDLL_API BYTE* __stdcall GetStageData(BYTE *lpData, DWORD dwDataSize, DWORD dwType, DWORD *lpdwSize)
 {
-	if (dwSize != NULL) *dwSize = 0;
+	if (lpdwSize != NULL) *lpdwSize = 0;
 	if (lpData==NULL) return NULL;
 
 	DWORD NumberOfBytesRead = 0;
@@ -41,12 +41,29 @@ F3SEDITDLL_API BYTE* __stdcall GetStageData(BYTE *lpData, DWORD dwDataSize, DWOR
 		type = *(DWORD*)(lpData+NumberOfBytesRead);
 		NumberOfBytesRead += 4;
 		if (type == dwType) {
-			if (dwSize != NULL) *dwSize = size;
+			if (lpdwSize != NULL) *lpdwSize = size;
 			return lpData+NumberOfBytesRead;
 		}
 		NumberOfBytesRead += size;
 	}
 	return NULL;
+}
+
+// 圧縮データを取得。なければNULL
+F3SEDITDLL_API BYTE* __stdcall GetCompressedStageData(BYTE *lpData, DWORD dwDataSize, DWORD dwPackSize, DWORD dwType, DWORD *lpdwSize)
+{
+	if (lpData==NULL) return NULL;
+
+	BYTE* data = lpData;
+	if (dwDataSize>dwPackSize) {
+		data = (BYTE*)::GlobalAlloc(GMEM_FIXED | GMEM_NOCOMPACT,dwDataSize+1);
+		CLZSS lzss;
+		lzss.Decode(lpData,data,dwDataSize,false);
+	}
+
+	BYTE* ret = GetStageData(data, dwDataSize, dwType, lpdwSize);
+	if (dwDataSize>dwPackSize) ::GlobalFree(data);
+	return ret;
 }
 
 // 圧縮書き出し

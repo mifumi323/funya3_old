@@ -14,7 +14,7 @@ Begin VB.Form FormMain
       Caption         =   "キー操作設定"
       Height          =   1335
       Index           =   20
-      Left            =   4920
+      Left            =   3360
       TabIndex        =   10
       Top             =   0
       Width           =   1815
@@ -48,9 +48,9 @@ Begin VB.Form FormMain
       Caption         =   "ユーザー定義BGM"
       Height          =   1695
       Index           =   10
-      Left            =   3000
+      Left            =   0
       TabIndex        =   1
-      Top             =   0
+      Top             =   960
       Width           =   2055
       Begin VB.CheckBox chkBGMLoop 
          Caption         =   "ループ"
@@ -96,12 +96,52 @@ Begin VB.Form FormMain
    End
    Begin VB.Frame fraCategory 
       Caption         =   "リプレイデータ"
-      Height          =   2295
+      Height          =   2895
       Index           =   40
-      Left            =   3000
+      Left            =   2880
       TabIndex        =   29
-      Top             =   2040
-      Width           =   3615
+      Top             =   1440
+      Width           =   3735
+      Begin VB.FileListBox filReplay 
+         Height          =   270
+         Left            =   1560
+         Pattern         =   "*.f3r"
+         TabIndex        =   40
+         Top             =   2040
+         Visible         =   0   'False
+         Width           =   975
+      End
+      Begin VB.CommandButton cmdDelete 
+         Caption         =   "削除"
+         Height          =   375
+         Left            =   1800
+         TabIndex        =   39
+         Top             =   2400
+         Width           =   735
+      End
+      Begin VB.CommandButton cmdConvert 
+         Caption         =   "録画"
+         Height          =   375
+         Left            =   960
+         TabIndex        =   38
+         Top             =   2400
+         Width           =   735
+      End
+      Begin VB.CommandButton cmdReplay 
+         Caption         =   "再生"
+         Height          =   375
+         Left            =   120
+         TabIndex        =   37
+         Top             =   2400
+         Width           =   735
+      End
+      Begin VB.ListBox lstReplay 
+         Height          =   240
+         Left            =   120
+         TabIndex        =   36
+         Top             =   2040
+         Width           =   1335
+      End
       Begin VB.HScrollBar hscRecordNumber 
          Height          =   255
          LargeChange     =   10
@@ -128,14 +168,6 @@ Begin VB.Form FormMain
          TabIndex        =   31
          Top             =   480
          Width           =   2175
-      End
-      Begin VB.Label lblRecord 
-         Caption         =   "リプレイはゲームと同じフォルダに000.f3r～999.f3rのファイル名で記録されます。"
-         Height          =   255
-         Left            =   120
-         TabIndex        =   36
-         Top             =   2040
-         Width           =   3255
       End
       Begin VB.Label lblRecordNumber 
          Caption         =   "記録する数"
@@ -166,10 +198,10 @@ Begin VB.Form FormMain
       Caption         =   "全般"
       Height          =   3495
       Index           =   0
-      Left            =   1440
+      Left            =   1920
       TabIndex        =   2
-      Top             =   600
-      Width           =   4695
+      Top             =   0
+      Width           =   3015
       Begin VB.CheckBox chkHyper 
          Caption         =   "氷の息無制限"
          Height          =   255
@@ -323,9 +355,9 @@ Begin VB.Form FormMain
       Caption         =   "プレイ記録"
       Height          =   615
       Index           =   100
-      Left            =   1440
+      Left            =   0
       TabIndex        =   14
-      Top             =   0
+      Top             =   360
       Width           =   1695
       Begin VB.ListBox lstResult 
          Height          =   240
@@ -432,6 +464,21 @@ Private Sub cmdCancel_Click()
     Unload Me
 End Sub
 
+Private Sub cmdConvert_Click()
+    If lstReplay.ListIndex < 0 Then Exit Sub
+    Shell "funya3.exe RECORD """ & Replace(filReplay.List(lstReplay.ListIndex), ".f3r", "") & """", vbNormalFocus
+End Sub
+
+Private Sub cmdDelete_Click()
+    Dim li As Integer
+    li = lstReplay.ListIndex
+    If MsgBox(lstReplay.List(li) & vbNewLine & "を削除します。よろしいですか？", vbOKCancel, "確認") = vbOK Then
+        Kill filReplay.List(li)
+        RefreshReplay
+        lstReplay.ListIndex = li - 1
+    End If
+End Sub
+
 Private Sub cmdKeyReset_Click()
     Key(GetKeyByDsc(cmbKey.Text)).Key = 0
     txtKey_LostFocus
@@ -449,6 +496,11 @@ Private Sub cmdPlay_Click()
     ChDir App.Path
     Shell "funya3.exe", vbNormalFocus
     Unload Me
+End Sub
+
+Private Sub cmdReplay_Click()
+    If lstReplay.ListIndex < 0 Then Exit Sub
+    Shell "funya3.exe REPLAY """ & Replace(filReplay.List(lstReplay.ListIndex), ".f3r", "") & """", vbNormalFocus
 End Sub
 
 Private Sub Form_Load()
@@ -494,6 +546,7 @@ Private Sub Form_Load()
         If Key(I).ID <> "KEY_SMILE" Or Smiles Then cmbKey.AddItem Key(I).Dsc
     Next
     cmbKey.ListIndex = 0
+    RefreshReplay
 End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
@@ -554,14 +607,22 @@ Private Sub Form_Resize()
         hscRecordMiss.Width = ItemWidth
         lblRecordNumber.Width = ItemWidth
         hscRecordNumber.Width = ItemWidth
-        lblRecord.Width = ItemWidth
-        lblRecord.Height = FrameHeight - lblRecord.Top - 120
+        lstReplay.Width = ItemWidth
+        lstReplay.Height = FrameHeight - lstReplay.Top - cmdReplay.Height - 240
+        cmdReplay.Top = lstReplay.Top + lstReplay.Height + 120
+        cmdReplay.Width = ItemWidth / 3 - 80
+        cmdConvert.Left = cmdReplay.Left + cmdReplay.Width + 120
+        cmdConvert.Top = cmdReplay.Top
+        cmdConvert.Width = cmdReplay.Width
+        cmdDelete.Left = cmdConvert.Left + cmdConvert.Width + 120
+        cmdDelete.Top = cmdReplay.Top
+        cmdDelete.Width = cmdReplay.Width
     End If
 End Sub
 
 Private Sub hscRecordClear_Change()
     Dim str As String
-    str = "クリアしたとき自動的に記録："
+    str = "クリア時自動で記録："
     Select Case hscRecordClear.Value
     Case 0: str = str & "しない"
     Case 100: str = str & "する"
@@ -576,7 +637,7 @@ End Sub
 
 Private Sub hscRecordMiss_Change()
     Dim str As String
-    str = "ミスしたとき自動的に記録："
+    str = "ミス時自動で記録："
     Select Case hscRecordMiss.Value
     Case 0: str = str & "しない"
     Case 100: str = str & "する"
@@ -867,3 +928,49 @@ Private Function TrueOption(Options) As Integer
         If O.Value = True Then TrueOption = O.Index
     Next
 End Function
+
+Private Sub RefreshReplay()
+    Dim I As Integer
+    Dim fn As String
+    filReplay.Refresh
+    If filReplay.ListCount = lstReplay.ListCount Then Exit Sub
+    lstReplay.Clear
+    For I = 0 To filReplay.ListCount - 1
+        fn = filReplay.List(I)
+        lstReplay.AddItem Left(fn, Len(fn) - 4) & " - " & GetStageName(fn)
+    Next
+End Sub
+
+Private Function GetStageName(fn As String)
+    Dim Size1 As Long, Size2 As Long
+    Dim N As Integer
+    Dim d() As Byte, s() As Byte
+    Dim stg As Long, fs As Long, Addr As Long
+    Const SCH_REPLAY As Long = &H4E475453
+    N = FreeFile
+    Open GetFullFileName(fn) For Binary Access Read Lock Read Write As N
+        ReDim d(7)
+        Get N, , d
+        If StrConv(d, vbUnicode) = "funya3s1" Then
+            Get N, , Size1
+            Get N, , Size2
+            ReDim s(Size1 - 1)
+            Get N, , s
+            'ステージ数ゲットです
+            Addr = GetCompressedStageData(s(0), Size1, Size2, SCH_REPLAY, fs)
+            If Addr Then
+                RtlMoveMemory stg, ByVal Addr, fs
+            Else
+                stg = 0
+            End If
+            GetStageName = GetDataString(s, GetChunkType("TL", stg), Size1, Size2)
+        End If
+    Close N
+End Function
+
+Public Function GetChunkType(Prefix As String, I As Long) As Long
+    Dim h() As Byte
+    h = LeftB(StrConv(Prefix & "  ", vbFromUnicode), 2) & StrConv(Right$("00" & Hex$(I), 2), vbFromUnicode)
+    GetChunkType = ((h(3) * 256& + h(2)) * 256& + h(1)) * 256& + h(0)
+End Function
+

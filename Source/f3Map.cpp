@@ -52,7 +52,7 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	BYTE* buf;
 	DWORD s;
 	DWORD bgm[BGMN_SIZE] = {0};
-	string ChipFile = "";
+//	string ChipFile = "";
 	m_pDIBBuf = new CDIB32;
 	m_pDIBBuf->CreateSurface(320,240);
 	m_Stage = stage;
@@ -122,12 +122,11 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	if ((buf = lp->GetStageData(CT_HITS,&s))!=NULL) {
 		if (s>240) s=240;
 		CopyMemory(m_Hit,buf,s);
-	}ef(CDir().IsFileExist(ChipFile+".f3h")) {
+/*	}ef(CDir().IsFileExist(ChipFile+".f3h")) {
 		CFile hitfile;
 		if (hitfile.Read(ChipFile+".f3h")==0) {
 			CopyMemory(m_Hit,hitfile.GetMemory(),min(hitfile.GetSize(),240));
-		}
-		// hitfile.Close(); は不要なはず
+		}*/
 	}
 	// マップデータ
 	if ((buf = lp->GetStageData(GetChunkType(CT_M000,stage),&s))!=NULL) {

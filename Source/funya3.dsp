@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 user32.lib gdi32.lib ole32.lib oleaut32.lib /nologo /subsystem:windows /machine:I386
+# ADD LINK32 user32.lib gdi32.lib ole32.lib oleaut32.lib shell32.lib /nologo /subsystem:windows /machine:I386
 
 !ELSEIF  "$(CFG)" == "funya3 - Win32 Debug"
 
@@ -182,6 +182,10 @@ SOURCE=.\GameScene.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\ReplayScene.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TitleScene.cpp
 # End Source File
 # End Group
@@ -216,6 +220,10 @@ SOURCE=.\f3MIDIOutput.cpp
 # Begin Source File
 
 SOURCE=.\App.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\AVIRecorder.cpp
 # End Source File
 # Begin Source File
 
@@ -367,6 +375,10 @@ SOURCE=.\yaneSDK\yaneFile.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\yaneSDK\yaneFileDialog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\yaneSDK\yaneFindWindow.cpp
 # End Source File
 # Begin Source File
@@ -512,6 +524,10 @@ SOURCE=.\App.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\AVIRecorder.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\BGMBase.h
 # End Source File
 # Begin Source File
@@ -649,6 +665,10 @@ SOURCE=.\GameScene.h
 # Begin Source File
 
 SOURCE=.\GameTitle.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ReplayScene.h
 # End Source File
 # Begin Source File
 

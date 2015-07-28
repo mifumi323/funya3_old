@@ -49,14 +49,7 @@ void Cf3Select::Clear()
 	m_Text->GetFont()->SetText(m_Menu);
 	m_Text->UpdateText();
 	m_Selected = m_Prev = m_Lines = 0;
-}
-
-void Cf3Select::Add(string item)
-{
-	m_Menu += item+"\n";
-	m_Text->GetFont()->SetText(m_Menu);
-	m_Text->UpdateText();
-	m_Lines++;
+	m_IDs.clear();
 }
 
 void Cf3Select::GetSize(int &sx, int &sy)
@@ -71,4 +64,13 @@ void Cf3Select::GetSize(int &sx, int &sy)
 void Cf3Select::Select(int num)
 {
 	if (num<m_Lines) m_Selected = num;
+}
+
+void Cf3Select::Add(string item, int id)
+{
+	m_Menu += item+"\n";
+	m_Text->GetFont()->SetText(m_Menu);
+	m_Text->UpdateText();
+	m_IDs.push_back(id);
+	m_Lines++;
 }

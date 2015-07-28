@@ -8,7 +8,7 @@
 #include "FirstScene.h"
 #include "TitleScene.h"
 #include "GameScene.h"
-//#include "TestScene.h"
+#include "ReplayScene.h"
 #include "ExplainScene.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ CScene* Cf3SceneFactory::CreateScene(int nScene) {
 	case FIRST_SCENE:	lp = new CFirstScene; break;
 	case TITLE_SCENE:	lp = new CTitleScene; break;
 	case GAME_SCENE:	lp = new CGameScene; break;
-//	case TEST_SCENE:	lp = new CTestScene; break;
+	case REPLAY_SCENE:	lp = new CReplayScene; break;
 	case EXPLAIN_SCENE:	lp = new CExplainScene; break;
 	default:			lp = NULL; // error..
 	}

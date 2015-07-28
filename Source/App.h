@@ -20,9 +20,12 @@ enum {
 };
 
 class CBGMBase;
+class CAVIRecorder;
 
 extern class CApp : public CAppFrame  {
 public:
+	void AVIRecordingStop();
+	void AVIRecordingStart();
 	static bool MakeFileName(string &filename, LPCSTR ext, int max=1000, bool bForceToMake=false);
 	void ScreenCapture();
 	void ChangeBGM(BGMMode no);
@@ -47,6 +50,7 @@ protected:
 	static CRand	m_Rand;
 	CBGMBase*		m_BGM;
 	BGMMode			m_BGMMode;
+	CAVIRecorder*	m_AVI;
 	Cf3Setting		m_Setting;
 
 	string m_StageFileName;

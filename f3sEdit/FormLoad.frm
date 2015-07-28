@@ -69,12 +69,29 @@ Private Sub Form_Load()
     Dim fn As String
     For I = 0 To filStage.ListCount - 1
         fn = filStage.List(I)
-        lstStage.AddItem GetStageName(fn) & "(" & Left(fn, Len(fn) - 4) & ")"
+        lstStage.AddItem Left(fn, Len(fn) - 4) & " - " & GetStageName(fn)
     Next
 End Sub
 
 Private Function GetStageName(fn As String)
-    GetStageName = ""
+    Dim Size1 As Long, Size2 As Long
+    Dim N As Integer
+    Dim d() As Byte, s() As Byte
+    Const SCH_TITLE As Long = &H4C544954
+    N = FreeFile
+    Open GetFullFileName(fn) For Binary Access Read Lock Read Write As N
+        ReDim d(7)
+        Get N, , d
+        If StrConv(d, vbUnicode) = "funya3s1" Then
+            Get N, , Size1
+            Get N, , Size2
+            If Size1 = Size2 Then
+                ReDim s(Size1 - 1)
+                Get N, , s
+                GetStageName = GetDataString(s, SCH_TITLE, Size1)
+            End If
+        End If
+    Close N
 End Function
 
 Private Sub Form_Resize()

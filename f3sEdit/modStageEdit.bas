@@ -14,26 +14,6 @@ Public Function GetFullFileName(fn As String) As String
     GetFullFileName = Replace(App.Path & "\" & fn, "\\", "\")
 End Function
 
-Public Sub GetData(aIn() As Byte, aOut() As Byte, Key As Long, Size As Long)
-'    if (dwSize != NULL) *dwSize = 0;
-'    if (m_lpData==NULL) return NULL;
-'    DWORD NumberOfBytesRead = 0;
-'    DWORD size, type;
-'    while (NumberOfBytesRead+8<=m_StageHeader.datasize) {
-'        size = *(DWORD*)(m_lpData+NumberOfBytesRead);
-'        NumberOfBytesRead += 4;
-'        type = *(DWORD*)(m_lpData+NumberOfBytesRead);
-'        NumberOfBytesRead += 4;
-'        if (type == dwType) {
-'            if (dwSize != NULL) *dwSize = size;
-'            return m_lpData+NumberOfBytesRead;
-'        }
-'        NumberOfBytesRead += size;
-'    }
-'    return NULL;
-End Sub
-
-
 Public Function GetDataString(aIn() As Byte, Key As Long, Size As Long)
     Dim d() As Byte
     Dim Addr As Long
@@ -52,7 +32,7 @@ Public Sub CreateMask(Src As PictureBox, Mask As PictureBox)
     With Mask
         .Cls
         .Picture = Src.Picture
-        BitBlt .hDC, 0, 0, .ScaleWidth, .ScaleHeight, Src.hDC, 0, 0, SRCINVERT
+        BitBlt .hdc, 0, 0, .ScaleWidth, .ScaleHeight, Src.hdc, 0, 0, SRCINVERT
     End With
 End Sub
 
@@ -68,9 +48,9 @@ Public Sub CloseAllWindow()
     Next
 End Sub
 
-Public Function GetGraphicFile(default As String) As String
+Public Function GetGraphicFile(Default As String) As String
     Load FormGraphic
-    FormGraphic.File = default
+    FormGraphic.File = Default
     FormGraphic.Show vbModal
     GetGraphicFile = FormGraphic.File
     Unload FormGraphic

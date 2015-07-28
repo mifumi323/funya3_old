@@ -10,7 +10,6 @@
 #endif // _MSC_VER > 1000
 
 #include "SceneBase.h"
-#include "f3NavigationBar.h"
 
 class Cf3Map;
 class Cf3NavigationBar;

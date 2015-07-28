@@ -73,6 +73,7 @@ public:
 	void Load(const string& filename);
 	void Replay();
 	void OnDraw(CDIB32 *lp) { m_pPlayerState->map->OnDraw(lp); }
+	Cf3Map* GetMap() { return m_pPlayerState->map; }
 
 };
 

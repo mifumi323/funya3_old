@@ -9,14 +9,17 @@
 #include "yaneSDK/yaneFPSLayer.h"
 #include "yaneSDK/yaneLineParser.h"
 #include "yaneSDK/yaneTextDIB32.h"
-#include "yaneSDK/yaneDir.h"
+#include "yaneSDK/yaneFile.h"
 #include "f3SceneFactory.h"
 #include "GameScene.h"
+#include "ReplayScene.h"
 #include "BGMDefault.h"
 #include "BGMUser.h"
 #include "f3MapObjectfunya.h"
 #include "f3Map.h"
 #include "ResourceManager.h"
+#include "AVIRecorder.h"
+#include <shlobj.h>
 
 CRand CApp::m_Rand;
 CApp* theApp;
@@ -25,12 +28,14 @@ CApp* theApp;
 CApp::CApp(){
 	m_BGM = NULL;
 	m_BGMMode = BGMM_NONE;
+	m_AVI = NULL;
 	m_Rand.Randomize();
 	theApp = this;
 }
 
 CApp::~CApp(){
 	DELETE_SAFE(m_BGM);
+	DELETE_SAFE(m_AVI);
 }
 
 //	これがmain windowのためのクラス。
@@ -48,9 +53,37 @@ class CAppMainWindow : public CAppBase {	//	アプリケーションクラスから派生
 	}
 };
 
+bool DirCheck() {
+	CFile file;
+	while (file.Open("resource/main.gif", "r")) {
+		if (MessageBox(NULL,
+			"必要なファイルが見つかりません。\nふにゃさんをインストールしたフォルダを指定してください。",
+			"エラー", MB_OKCANCEL)!=IDOK) return false;
+		BROWSEINFO bInfo;
+		LPITEMIDLIST pIDList;
+		TCHAR szDisplayName[MAX_PATH];
+    
+		bInfo.hwndOwner = NULL;
+		bInfo.pidlRoot = NULL;
+		bInfo.pszDisplayName = szDisplayName;
+		bInfo.lpszTitle = "フォルダの選択";
+		bInfo.ulFlags = BIF_RETURNONLYFSDIRS;
+		bInfo.lpfn = NULL;
+		bInfo.lParam = (LPARAM)0;
+    
+		if((pIDList=SHBrowseForFolder(&bInfo))==NULL) return false;
+		if(!SHGetPathFromIDList(pIDList, szDisplayName)) return false;
+		CFile::SetCurrentDir(szDisplayName);
+
+		CoTaskMemFree( pIDList );
+	}
+	return true;
+}
+
 //	言わずと知れたWinMain
 int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow){
 	CAppInitializer::Init(hInstance,hPrevInstance,lpCmdLine,nCmdShow);	//	必ず書いてね
+	if (!DirCheck()) return 0;
 	CSingleApp sapp;
 	if (sapp.IsValid()) {
 		CAppMainWindow().Run();					//	上で定義したメインのウィンドゥを作成
@@ -59,6 +92,33 @@ int APIENTRY WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine
 }
 
 void CApp::MainThread(){
+	//  シーンコントローラーにSceneFactoryを渡してやる
+	CSceneControl sc(smart_ptr<CSceneFactory>(new Cf3SceneFactory(this),true));
+	int scene = FIRST_SCENE;
+	// テストじゃないかな？
+	{
+		CLineParser l;
+		l.SetLine(CAppInitializer::GetCmdLine());
+		if (l.IsMatch("TEST")) {
+			scene = GAME_SCENE;
+			CGameScene::m_bTest = true;
+			l.GetStr(m_StageFileName);
+			m_StageFileName += ".f3s";
+			l.GetNum(CGameScene::m_nStage);
+		}ef(l.IsMatch("REPLAY")) {
+			scene = REPLAY_SCENE;
+			l.GetStr(m_StageFileName);
+			m_StageFileName += ".f3r";
+		}ef(l.IsMatch("RECORD")) {
+			CReplayScene::record = true;
+			m_Setting.m_FullScreen = false;
+			scene = REPLAY_SCENE;
+			l.GetStr(m_StageFileName);
+			m_StageFileName += ".f3r";
+		}
+	}
+	sc.JumpScene(scene);
+
 	// 準備完了まで著作権表示
 	GetDraw()->SetDisplay(m_Setting.m_FullScreen!=0,320,240);
 	{
@@ -85,23 +145,6 @@ void CApp::MainThread(){
 	Cf3MapObjectMain::SetInput(&KeyInput);
 	ResourceManager.Init();
 
-	//  シーンコントローラーにSceneFactoryを渡してやる
-	CSceneControl sc(smart_ptr<CSceneFactory>(new Cf3SceneFactory(this),true));
-	int scene = FIRST_SCENE;
-	// テストじゃないかな？
-	{
-		CLineParser l;
-		l.SetLine(CAppInitializer::GetCmdLine());
-		if (l.IsMatch("TEST")) {
-			scene = GAME_SCENE;
-			CGameScene::m_bTest = true;
-			l.GetStr(m_StageFileName);
-			m_StageFileName += ".f3s";
-			l.GetNum(CGameScene::m_nStage);
-		}
-	}
-	sc.JumpScene(scene);
-
 	while (IsThreadValid()) {
 		f3Input.Input();
 		if (GetForegroundWindow()==GetMyApp()->GetHWnd()) {
@@ -116,6 +159,7 @@ void CApp::MainThread(){
 			l.Enable(f3Input.GetKeyPressed(F3KEY_FPS));
 			GetDraw()->OnDraw();
 			if (f3Input.GetKeyPushed(F3KEY_CAPTURE)) ScreenCapture();
+			if (m_AVI) m_AVI->Write(GetDraw()->GetSecondary());
 		}
 		t.WaitFrame();
 	}
@@ -162,12 +206,11 @@ void CApp::ScreenCapture()
 bool CApp::MakeFileName(string &filename, LPCSTR ext, int max, bool bForceToMake)
 {
 	char file[16];
-	CDir dir;
 	ULARGE_INTEGER oldest = { ULONG_MAX, ULONG_MAX };
 	ULARGE_INTEGER t;
 	for (int i=0; i<max; i++) {
 		sprintf(file, "%03d.%s", i, ext);
-		HANDLE h = ::CreateFile(file,
+		HANDLE h = ::CreateFile(CFile::MakeFullName(file).c_str(),
 			GENERIC_READ,		// Read
 			FILE_SHARE_READ,	// ReadOpenなら共有を許すのはマナー 
 			NULL,				// security
@@ -192,4 +235,15 @@ bool CApp::MakeFileName(string &filename, LPCSTR ext, int max, bool bForceToMake
 	}
 	if (!bForceToMake) return false;
 	return !(oldest.HighPart==ULONG_MAX&&oldest.LowPart==ULONG_MAX);
+}
+
+void CApp::AVIRecordingStart()
+{
+	AVIRecordingStop();
+	m_AVI = new CAVIRecorder;
+}
+
+void CApp::AVIRecordingStop()
+{
+	DELETE_SAFE(m_AVI);
 }

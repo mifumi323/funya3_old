@@ -11,6 +11,7 @@
 
 #include "YANESDK\yaneScene.h"
 #include "YANESDK\yaneDIB32.h"
+#include "f3NavigationBar.h"
 //#include "App.h"
 
 enum SCENE {
@@ -18,7 +19,7 @@ enum SCENE {
 	FIRST_SCENE,
 	TITLE_SCENE,
 	GAME_SCENE,
-//	TEST_SCENE,
+	REPLAY_SCENE,
 	EXPLAIN_SCENE,
 };
 

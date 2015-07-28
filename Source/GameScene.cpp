@@ -390,9 +390,9 @@ void CGameScene::Pause()
 	m_Map->GarbageMapObject();
 	if (theSetting->m_ESP) m_Map->CreateTemparatureMap(m_Temparature);
 	m_Select->Clear();
-	m_Select->Add("Return to Game");
-	m_Select->Add("Give Up");
-	m_Select->Add("Exit");
+	m_Select->Add("‘±‚¯‚é");
+	m_Select->Add("Ž©”š");
+	m_Select->Add("‚à‚¤‚â‚ß‚é");
 	int sw,sh;
 	m_Select->GetSize(sw,sh);
 	m_Select->SetPos(160-sw/2,136-sh/2);

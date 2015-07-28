@@ -84,11 +84,11 @@ Public Function GetStageTitle(num As Byte) As String
 End Function
 
 Public Function GetMapChipDC(Level As Integer) As Long
-    If 0 <= Level And Level <= 2 Then GetMapChipDC = MDIFormMain.picChip(Level).hDC
+    If 0 <= Level And Level <= 2 Then GetMapChipDC = MDIFormMain.picChip(Level).hdc
 End Function
 
 Public Function GetMapChipMaskDC(Level As Integer) As Long
-    If 0 <= Level And Level <= 2 Then GetMapChipMaskDC = MDIFormMain.picChipMask(Level).hDC
+    If 0 <= Level And Level <= 2 Then GetMapChipMaskDC = MDIFormMain.picChipMask(Level).hdc
 End Function
 
 Public Function GetTitle() As String

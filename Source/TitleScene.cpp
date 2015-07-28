@@ -51,20 +51,27 @@ void CTitleScene::OnInit()
 	m_TextNavi.text->GetFont()->SetBackColor(0x303030);
 	m_NavigationBar->Add(&m_TextNavi);
 	SetStage();
-	SetMap(m_Select->GetSelected()*theSetting->GetProgress(*m_itStageFile));
+	if (m_Select->GetSelected()==0) {
+		SetMap(0);
+	}else if (m_Select->GetSelected()==1) {
+		SetMap(theSetting->GetProgress(*m_itStageFile));
+	}
 	theApp->GetBGM()->Play(BGMN_TITLE);
 }
 
 void CTitleScene::OnDraw(CDIB32 *lp)
 {
 	if (f3Input.GetKeyPushed(F3KEY_PAUSE)) {
+		int next = GAME_SCENE;
 		if (m_Select->GetSelected()==0) {
 			theSetting->SetProgress(*m_itStageFile,0);
-		}else {
+		}else if (m_Select->GetSelected()==1) {
 			theSetting->m_Banana -= m_nPenalty;
+		}else {
+			next = FIRST_SCENE;
 		}
 		f3Input.Input();
-		JumpScene(GAME_SCENE);
+		JumpScene(next);
 	}
 	bool Change = false;
 	if (f3Input.GetKeyPushed(F3KEY_LEFT)) {
@@ -78,8 +85,13 @@ void CTitleScene::OnDraw(CDIB32 *lp)
 		Change = true;
 	}
 	if (Change) SetStage();
-	if (Change||m_Select->Changed())
-		SetMap(m_Select->GetSelected()*theSetting->GetProgress(*m_itStageFile));
+	if (Change||m_Select->Changed()) {
+		if (m_Select->GetSelected()==0) {
+			SetMap(0);
+		}else if (m_Select->GetSelected()==1) {
+			SetMap(theSetting->GetProgress(*m_itStageFile));
+		}
+	}
 	m_Map->OnDraw(lp);
 	int w,h;
 	m_TextStageFile->GetSize(w,h);
@@ -151,16 +163,17 @@ void CTitleScene::SetStage()
 		m_TextNavi.Update();
 	}
 	m_Select->Clear();
-	m_Select->Add("‚Í‚¶‚ß‚©‚ç");
+	m_Select->Add("‚Í‚¶‚ß‚©‚ç", 0);
 	BYTE*Buf = m_StageFile->GetStageData(CT_PNLT);
 	m_nPenalty = (Buf?*Buf:100);
 	if (theSetting->GetProgress(*m_itStageFile)&&
 		m_nPenalty<=theSetting->m_Banana) {
 		char strbuf[256];
 		sprintf(strbuf,"‘±‚«‚©‚ç(%d)",m_nPenalty);
-		m_Select->Add(strbuf);
+		m_Select->Add(strbuf, 1);
 		m_Select->Select(1);
 	}
+	m_Select->Add("I‚í‚é", 99);
 }
 
 void CTitleScene::SetMap(int map)
