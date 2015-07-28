@@ -14,9 +14,6 @@
 #include "App.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectEelPitcher::m_Graphic;
-bool Cf3MapObjectEelPitcher::m_bGraphicInitialize = false;*/
-
 set<Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
 
 //////////////////////////////////////////////////////////////////////
@@ -26,11 +23,6 @@ set<Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
 Cf3MapObjectEelPitcher::Cf3MapObjectEelPitcher(int nCX, int nCY)
 {
 	m_EnemyList.insert(this);
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/EelPitcher.gif");
-		m_bGraphicInitialize = true;
-	}
-	m_Graphic.Open("resource/EelPitcher.gif");*/
 	m_Graphic = ResourceManager.Get(RID_EELPITCHER);
 	m_Delay = 0;
 	m_Level = 1;
@@ -177,7 +169,7 @@ void Cf3MapObjectEelPitcher::Seed()
 
 void Cf3MapObjectEelPitcher::Synergy()
 {
-	if (!IsValid()) return;
+/*	if (!IsValid()) return;
 	m_bBlinking = false;
 	if (m_State==EELLEAF) {
 		Reaction(m_pParent->GetMainChara());
@@ -239,6 +231,66 @@ void Cf3MapObjectEelPitcher::Synergy()
 	for(set<Cf3MapObjectNeedle*>::iterator nd = Cf3MapObjectNeedle::IteratorBegin();
 	nd!=Cf3MapObjectNeedle::IteratorEnd();nd++){
 		if ((*nd)->IsValid()) Reaction((*nd));
+	}*/
+	if (!IsValid()) return;
+	m_bBlinking = false;
+	int cx, cy;
+	GetCPos(cx, cy);
+	Cf3MapObjectBase**it;
+	if (m_State==EELLEAF) {
+		for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, OID_FUNYA); (*it)!=NULL; it++){
+			if ((*it)->IsValid()) Reaction((*it));
+		}
+		if (m_RootY-m_Y>16) {
+			for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_ICE); (*it)!=NULL; it++){
+				if ((*it)->IsValid()) {
+					float objX, objY;
+					(*it)->GetPos(objX,objY);
+					if (IsIn(m_X-16,objX,m_X+16)) {
+						if (IsIn(m_Y,objY,m_Y+40)) {
+							Freeze();
+						}
+					}
+				}
+			}
+		}
+	}
+	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_EELPITCHER); (*it)!=NULL; it++){
+		if ((*it)->IsValid()&&(*it)!=this) {
+			float objX, objY;
+			(*it)->GetPos(objX,objY);
+			if (m_State==EELLEAF||m_State==EELFROZEN) {
+				if (IsIn(m_X-16,objX,m_X+16)) {
+					if (IsIn(m_Y,objY,m_Y+16)) {
+						if (((Cf3MapObjectEelPitcher*)(*it))->m_State!=EELLEAF) {
+							// 食べちゃった！！
+							m_Level+=((Cf3MapObjectEelPitcher*)(*it))->m_Level;
+						}else {
+							// 食べられちゃった！！
+							m_State = EELDEAD;
+						}
+					}
+				}
+			}ef(m_State==EELSEED) {
+				if (IsIn(objX-16,m_X,objX+16)) {
+					if (IsIn(objY,m_Y,objY+16)) {
+						if (((Cf3MapObjectEelPitcher*)(*it))->m_State!=EELDEAD) {
+							// 食べられちゃった！！
+							m_State = EELDEAD;
+						}else {
+							// 食べちゃった！！
+							m_Level+=((Cf3MapObjectEelPitcher*)(*it))->m_Level;
+						}
+					}
+				}
+			}
+		}
+	}
+	for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, OID_GEASPRIN); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) Reaction((*it));
+	}
+	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_NEEDLE); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) Reaction((*it));
 	}
 }
 
@@ -254,7 +306,6 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 				// 踏まれた！！
 				m_bBlinking = true;
 			}
-		}else {
 		}
 		break;
 				   }
@@ -265,7 +316,6 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 				// 食べちゃった！！
 				m_Level++;
 			}
-		}else {
 		}
 		break;
 				   }
@@ -278,42 +328,27 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 void Cf3MapObjectEelPitcher::OnMoveAll()
 {
 	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnMove();
+		if ((*it)->m_bValid) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectEelPitcher::SynergyAll()
 {
 	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->IsValid())
-			(*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
 void Cf3MapObjectEelPitcher::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectEelPitcher::OnDrawAll(CDIB32 *lp)
 {
 	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
 	}
-}
-
-void Cf3MapObjectEelPitcher::Freeze()
-{
-	m_State = EELFROZEN;
-	m_Delay = 80;
-}
-
-bool Cf3MapObjectEelPitcher::IsLeaf()
-{
-	return m_State==EELLEAF || m_State==EELFROZEN;
 }

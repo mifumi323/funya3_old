@@ -10,9 +10,6 @@
 #include "yaneSDK/yaneTextDIB32.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectmrframe::m_Graphic;
-bool Cf3MapObjectmrframe::m_bGraphicInitialize = false;*/
-
 set<Cf3MapObjectmrframe*>	Cf3MapObjectmrframe::m_EnemyList;
 
 //////////////////////////////////////////////////////////////////////
@@ -25,11 +22,6 @@ Cf3MapObjectmrframe::Cf3MapObjectmrframe(int nCX, int nCY)
 	m_funya = new Cf3MapObjectfunya(nCX,nCY);
 	m_CharaList.erase(m_funya);
 	m_funya->m_bOriginal = false;
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/mrframe.gif");
-		m_bGraphicInitialize = true;
-	}
-	m_Graphic.Open("resource/mrframe.gif");*/
 	m_Graphic = ResourceManager.Get(RID_MRFRAME);
 	SetID(OID_FUNYA);
 	SetPos(m_funya->m_X,m_funya->m_Y);
@@ -116,36 +108,37 @@ void Cf3MapObjectmrframe::Synergy()
 void Cf3MapObjectmrframe::OnMoveAll()
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnMove();
+		if ((*it)->m_bValid) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectmrframe::SynergyAll()
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->IsValid())
-			(*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
 void Cf3MapObjectmrframe::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectmrframe::OnDrawAll(CDIB32 *lp)
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
 	}
 }
 
 bool Cf3MapObjectmrframe::IsFrozen()
 {
 	return m_funya->IsFrozen();
+}
+
+void Cf3MapObjectmrframe::UpdateCPos()
+{
+	m_funya->UpdateCPos();
 }

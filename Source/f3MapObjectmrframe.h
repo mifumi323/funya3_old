@@ -25,6 +25,7 @@ protected:
 	Cf3MapObjectfunya	*m_funya;
 	int					m_nLife;
 public:
+	void UpdateCPos();
 	bool IsFrozen();
 	static set<Cf3MapObjectmrframe*>	m_EnemyList;
 	static void OnDrawAll(CDIB32 *lp);

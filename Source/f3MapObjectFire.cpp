@@ -35,25 +35,32 @@ Cf3MapObjectFire::~Cf3MapObjectFire()
 
 void Cf3MapObjectFire::OnDrawAll(CDIB32 *lp)
 {
-	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+	int sx, sy, ex, ey;
+	sx = sy = 0;
+	m_pParent->GetViewPos(sx,sy);
+	sx = (-sx)>>5; sy = (-sy)>>5;
+	ex = sx+320/32; ey = sy+224/32;
+	Saturate(sx,ex,m_pParent->GetWidth()-1);
+	Saturate(sy,ey,m_pParent->GetHeight()-1);
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, OID_FIRE); (*it)!=NULL; it++) {
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
+/*	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	}*/
 }
 
 void Cf3MapObjectFire::OnMoveAll()
 {
 	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnMove();
+		if ((*it)->m_bValid) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectFire::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
@@ -102,7 +109,16 @@ void Cf3MapObjectFire::Synergy()
 {
 	if (m_Delay==0) {
 		// Ç”Ç…Ç·
-		if (m_pParent->GetMainChara()->IsFrozen()) {
+		Cf3MapObjectBase**it;
+		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_FUNYA); (*it)!=NULL; it++){
+			if ((*it)->IsValid()&&((Cf3MapObjectMain*)(*it))->IsFrozen()) {
+				float objX, objY;
+				(*it)->GetPos(objX,objY);
+				// Ç†ÇΩÇ¡ÇΩÅI
+				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) m_Delay = 200;
+			}
+		}
+/*		if (m_pParent->GetMainChara()->IsFrozen()) {
 			float objX, objY;
 			m_pParent->GetMainChara()->GetPos(objX,objY);
 			if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
@@ -120,9 +136,17 @@ void Cf3MapObjectFire::Synergy()
 					m_Delay = 200;
 				}
 			}
-		}
+		}*/
 		// ïX
-		for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
+		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_ICE); (*it)!=NULL; it++){
+			if ((*it)->IsValid()) {
+				float objX, objY;
+				(*it)->GetPos(objX,objY);
+				// Ç†ÇΩÇ¡ÇΩÅI
+				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) m_Delay = 200;
+			}
+		}
+/*		for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
 		ic!=Cf3MapObjectIce::IteratorEnd();ic++){
 			if ((*ic)->IsValid()) {
 				float objX, objY;
@@ -132,6 +156,6 @@ void Cf3MapObjectFire::Synergy()
 					m_Delay = 200;
 				}
 			}
-		}
+		}*/
 	}
 }

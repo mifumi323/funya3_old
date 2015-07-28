@@ -10,8 +10,6 @@
 #include "f3Map.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectBanana::m_Graphic;
-bool Cf3MapObjectBanana::m_bGraphicInitialize = false;*/
 set<Cf3MapObjectBanana*> Cf3MapObjectBanana::m_BananaList;
 
 //////////////////////////////////////////////////////////////////////
@@ -21,13 +19,9 @@ set<Cf3MapObjectBanana*> Cf3MapObjectBanana::m_BananaList;
 Cf3MapObjectBanana::Cf3MapObjectBanana(int nCX, int nCY)
 {
 	m_BananaList.insert(this);
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/Items.gif");
-		m_bGraphicInitialize = true;
-	}
-	m_Graphic.Open("resource/Items.gif");*/
 	m_Graphic = ResourceManager.Get(RID_MAIN);
 	SetPos(nCX*32+16,nCY*32+16);
+	m_pParent->AddMapObject(m_nCX=nCX, m_nCY=nCY, this);
 	SetID(OID_BANANA);
 }
 
@@ -47,11 +41,15 @@ void Cf3MapObjectBanana::OnDraw(CDIB32 *lp)
 void Cf3MapObjectBanana::Synergy()
 {
 	if (!IsValid()) return;
-	Reaction(m_pParent->GetMainChara());
+	Cf3MapObjectBase**it;
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_FUNYA); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) Reaction((*it));
+	}
+/*	Reaction(m_pParent->GetMainChara());
 	for(set<Cf3MapObjectmrframe*>::iterator it = Cf3MapObjectmrframe::IteratorBegin();it!=Cf3MapObjectmrframe::IteratorEnd();it++){
 		if ((*it)->IsValid())
 			Reaction((*it));
-	}
+	}*/
 }
 
 void Cf3MapObjectBanana::Reaction(Cf3MapObjectBase *obj)
@@ -76,17 +74,25 @@ void Cf3MapObjectBanana::Reaction(Cf3MapObjectBase *obj)
 
 void Cf3MapObjectBanana::OnDrawAll(CDIB32 *lp)
 {
-	for(set<Cf3MapObjectBanana*>::iterator it = m_BananaList.begin();it!=m_BananaList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+	int sx, sy, ex, ey;
+	sx = sy = 0;
+	m_pParent->GetViewPos(sx,sy);
+	sx = (-sx)>>5; sy = (-sy)>>5;
+	ex = sx+320/32; ey = sy+224/32;
+	Saturate(sx,ex,m_pParent->GetWidth()-1);
+	Saturate(sy,ey,m_pParent->GetHeight()-1);
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx, sy, ex, ey, OID_BANANA); (*it)!=NULL; it++) {
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
+/*	for(set<Cf3MapObjectBanana*>::iterator it = m_BananaList.begin();it!=m_BananaList.end();it++){
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	}*/
 }
 
 void Cf3MapObjectBanana::SynergyAll()
 {
 	for(set<Cf3MapObjectBanana*>::iterator it = m_BananaList.begin();it!=m_BananaList.end();it++){
-		if ((*it)->IsValid())
-			(*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
@@ -94,7 +100,6 @@ void Cf3MapObjectBanana::OnPreDrawAll()
 {
 	// ç°ÇÃÇ∆Ç±ÇÎOnPreDrawÇÕégÇÌÇÍÇƒÇ¢Ç»Ç¢
 /*	for(set<Cf3MapObjectBanana*>::iterator it = m_BananaList.begin();it!=m_BananaList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}*/
 }

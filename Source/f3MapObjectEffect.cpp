@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "f3MapObjectEffect.h"
+#include "f3Map.h"
 #include "App.h"
 #include "ResourceManager.h"
 
@@ -38,17 +39,6 @@ const float PI=3.141592653589793238f;
 Cf3MapObjectEffect::Cf3MapObjectEffect(float x, float y, int EffectType)
 {
 	m_EffectList.insert(this);
-/*	if (!m_bGraphicInitialize) {
-		for (int i=0; i<4*16; i++) {
-			m_GraphicRect[i].left = (i>>2)*5;
-			m_GraphicRect[i].top = (i&3)*5;
-			m_GraphicRect[i].right = m_GraphicRect[i].left+5;
-			m_GraphicRect[i].bottom = m_GraphicRect[i].top+5;
-		}
-		m_Graphic.Load("resource/Stars.gif");
-		m_bGraphicInitialize = true;
-	}
-	m_Graphic.Open("resource/Stars.gif");*/
 	m_Graphic = ResourceManager.Get(RID_EFFECT);
 	SetPos(x,y);
 	m_StarNum = 0;
@@ -85,6 +75,7 @@ Cf3MapObjectEffect::Cf3MapObjectEffect(float x, float y, int EffectType)
 	for (int i=0; i<m_StarNum; i++) {
 		m_Star[i].r =CApp::random(4*16);
 	}
+	SetID(OID_EFFECT);
 }
 
 Cf3MapObjectEffect::~Cf3MapObjectEffect()
@@ -95,16 +86,24 @@ Cf3MapObjectEffect::~Cf3MapObjectEffect()
 
 void Cf3MapObjectEffect::OnPreDrawAll() {
 	for(set<Cf3MapObjectEffect*>::iterator it = m_EffectList.begin();it!=m_EffectList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectEffect::OnDrawAll(CDIB32 *lp) {
-	for(set<Cf3MapObjectEffect*>::iterator it = m_EffectList.begin();it!=m_EffectList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+	int sx, sy, ex, ey;
+	sx = sy = 0;
+	m_pParent->GetViewPos(sx,sy);
+	sx = (-sx)>>5; sy = (-sy)>>5;
+	ex = sx+320/32; ey = sy+224/32;
+	Saturate(sx,ex,m_pParent->GetWidth()-1);
+	Saturate(sy,ey,m_pParent->GetHeight()-1);
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-3, sy-3, ex+3, ey+3, OID_EFFECT); (*it)!=NULL; it++) {
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
+/*	for(set<Cf3MapObjectEffect*>::iterator it = m_EffectList.begin();it!=m_EffectList.end();it++){
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	}*/
 }
 
 void Cf3MapObjectEffect::OnPreDraw()

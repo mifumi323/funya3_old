@@ -227,6 +227,125 @@ void Cf3MapObjectfff::Synergy()
 {
 	if (m_State==DEAD||m_State==SMILE) return;
 	m_Power = m_PowerX = m_PowerY = 0.0f;
+	Cf3MapObjectBase**it;
+	// ÉMÉÑÉoÉl
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_GEASPRIN); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) {
+			float objX, objY;
+			(*it)->GetPos(objX,objY);
+			if (!((Cf3MapObjectGeasprin*)(*it))->IsFrozen()) {
+				if (IsIn(objX-16,m_X,objX+15)) {
+					if (IsIn(objY-30,m_Y,objY+16)) {
+						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
+						m_DY=-10;
+					}
+				}ef(IsIn(objX+16,m_X,objX+29)) {
+					if (IsIn(objY-16,m_Y,objY+15)) {
+						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
+						m_DX=10;
+					}
+				}ef(IsIn(objX-29,m_X,objX-16)) {
+					if (IsIn(objY-16,m_Y,objY+15)) {
+						theApp->GetBGM()->MusicEffect(MEN_GEASPRIN);
+						m_DX=-10;
+					}
+				}
+			}else{
+				if (IsIn(objX-16,m_X,objX+15)) {
+					if (IsIn(objY-30,m_Y,objY)&&m_DY>=0) {
+						m_Y = objY-30;
+						m_DY=0;
+					}
+				}ef(IsIn(objX+16,m_X,objX+29)) {
+					if (IsIn(objY-16,m_Y,objY+15)) {
+						m_X = objX+30;
+						m_DX=0;
+					}
+				}ef(IsIn(objX-29,m_X,objX-16)) {
+					if (IsIn(objY-16,m_Y,objY+15)) {
+						m_X = objX-30;
+						m_DX=-0;
+					}
+				}
+			}
+		}
+	}
+	// Ç∆Ç∞Ç∆Ç∞
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_NEEDLE); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) {
+			float objX, objY;
+			(*it)->GetPos(objX,objY);
+			if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
+				Die();
+				return;
+			}
+		}
+	}
+	// ÉEÉiÉMÉJÉYÉâ
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+		if ((*it)->IsValid()&&((Cf3MapObjectEelPitcher*)(*it))->IsLeaf()) {
+			float objX, objY;
+			(*it)->GetPos(objX,objY);
+			if (IsIn(objX-16,m_X,objX+16)) {
+				if (IsIn(objY-14,m_Y,objY)) {
+					if (m_DY>=0) {
+						m_Y = objY-14;
+						m_DY=0;
+					}
+				}
+			}
+		}
+	}
+	if (m_State!=FROZEN) {
+		// ïX
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_ICE); (*it)!=NULL; it++){
+			if ((*it)->IsValid()&&((Cf3MapObjectIce*)(*it))->GetSize()>10) {
+				float objX, objY;
+				(*it)->GetPos(objX,objY);
+				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
+					// Ç†ÇΩÇ¡ÇΩÅI
+					Freeze(((Cf3MapObjectIce*)(*it))->GetSize());
+				}
+			}
+		}
+		// ïXÉ]Å[Éì
+		for(set<Cf3MapObjectIceSource*>::iterator is = Cf3MapObjectIceSource::IteratorBegin();
+		is!=Cf3MapObjectIceSource::IteratorEnd();is++){
+			float objX, objY;
+			(*is)->GetPos(objX,objY);
+			float dX = objX-m_X, dY = objY-m_Y,
+				p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
+			m_Power += p;
+			m_PowerX+= dX*p3;
+			m_PowerY+= dY*p3;
+		}
+		// âäÉ]Å[Éì
+		for(set<Cf3MapObjectFire*>::iterator fr = Cf3MapObjectFire::IteratorBegin();
+		fr!=Cf3MapObjectFire::IteratorEnd();fr++){
+			if ((*fr)->IsActive()) {
+				float objX, objY;
+				(*fr)->GetPos(objX,objY);
+				float dX = objX-m_X, dY = objY-m_Y,
+					p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
+				m_Power -= p;
+				m_PowerX-= dX*p3;
+				m_PowerY-= dY*p3;
+			}
+		}
+		if (m_Power>1.0f/256.0f) {
+			Freeze();
+		}ef(m_Power>1.0f/4096.0f) {
+			m_nPower=4;
+			m_PowerX = m_PowerY = 0.0f;
+		}ef(m_Power<-1.0f/256.0f) {
+			Die();
+		}ef(m_Power<-1.0f/4096.0f) {
+		}else{
+			m_PowerX = m_PowerY = 0.0f;
+		}
+	}
+/*	if (m_State==DEAD||m_State==SMILE) return;
+	m_Power = m_PowerX = m_PowerY = 0.0f;
 	// ÉMÉÑÉoÉl
 	for(set<Cf3MapObjectGeasprin*>::iterator gs = Cf3MapObjectGeasprin::IteratorBegin();
 	gs!=Cf3MapObjectGeasprin::IteratorEnd();gs++){
@@ -314,20 +433,18 @@ void Cf3MapObjectfff::Synergy()
 		// ïXÉ]Å[Éì
 		for(set<Cf3MapObjectIceSource*>::iterator is = Cf3MapObjectIceSource::IteratorBegin();
 		is!=Cf3MapObjectIceSource::IteratorEnd();is++){
-//			if ((*is)->IsValid()) {	// IsValid==falseÇ…Ç»ÇÈÇ±Ç∆ÇÕÇ»Ç¢(Ç∆évÇ§)
-				float objX, objY;
-				(*is)->GetPos(objX,objY);
-				float dX = objX-m_X, dY = objY-m_Y,
-					p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
-				m_Power += p;
-				m_PowerX+= dX*p3;
-				m_PowerY+= dY*p3;
-//			}
+			float objX, objY;
+			(*is)->GetPos(objX,objY);
+			float dX = objX-m_X, dY = objY-m_Y,
+				p=1.0f/(dX*dX+dY*dY), p3 = p*sqrt(p);
+			m_Power += p;
+			m_PowerX+= dX*p3;
+			m_PowerY+= dY*p3;
 		}
 		// âäÉ]Å[Éì
 		for(set<Cf3MapObjectFire*>::iterator fr = Cf3MapObjectFire::IteratorBegin();
 		fr!=Cf3MapObjectFire::IteratorEnd();fr++){
-			if (/*(*fr)->IsValid()&&*/(*fr)->IsActive()) {	// IsValid==falseÇ…Ç»ÇÈÇ±Ç∆ÇÕÇ»Ç¢(Ç∆évÇ§)
+			if ((*fr)->IsActive()) {
 				float objX, objY;
 				(*fr)->GetPos(objX,objY);
 				float dX = objX-m_X, dY = objY-m_Y,
@@ -348,7 +465,7 @@ void Cf3MapObjectfff::Synergy()
 		}else{
 			m_PowerX = m_PowerY = 0.0f;
 		}
-	}
+	}*/
 }
 
 void Cf3MapObjectfff::Freeze(int level)

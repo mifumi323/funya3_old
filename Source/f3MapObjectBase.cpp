@@ -19,23 +19,27 @@ Cf3MapObjectBase::Cf3MapObjectBase()
 	m_bValid = true;
 	m_X = m_Y = 0;
 	m_nScrollX = m_nScrollY = 1.0f;	// 標準でスクロールに完全についてゆく
-	m_nID = 0;
+	m_nID = OID_UNKNOWN;
+	m_pNext = NULL;
+	m_nCX = m_nCY = -1;
 }
 
 Cf3MapObjectBase::~Cf3MapObjectBase()
 {
+	m_pParent->RemoveMapObject(m_nCX, m_nCY, this);
 	m_CharaList.erase(this);
+}
+
+void Cf3MapObjectBase::Kill()
+{
+	m_pParent->RemoveMapObject(m_nCX, m_nCY, this);
+	m_bValid = false;
 }
 
 void Cf3MapObjectBase::SetViewPos(float offsetx, float offsety)
 {
 	m_nVX = m_X+offsetx;	m_nVY = m_Y+offsety;
 	if (m_pParent!=NULL) m_pParent->GetViewPos(m_nVX,m_nVY,m_nScrollX,m_nScrollY);
-}
-
-void Cf3MapObjectBase::SetParent(Cf3Map *lp)
-{
-	m_pParent = lp;
 }
 
 float Cf3MapObjectBase::GetDistance(Cf3MapObjectBase &obj)
@@ -72,7 +76,23 @@ void Cf3MapObjectBase::Garbage()
 void Cf3MapObjectBase::KillAll()
 {
 	for(set<Cf3MapObjectBase*>::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->Kill();
+		if ((*it)->m_bValid) (*it)->Kill();
+	}
+}
+
+void Cf3MapObjectBase::UpdateCPos()
+{
+	int cx, cy;
+	GetCPos(cx, cy);
+	if (m_nCX!=cx||m_nCY!=cy) {
+		m_pParent->RemoveMapObject(m_nCX, m_nCY, this);
+		m_pParent->AddMapObject(m_nCX=cx, m_nCY=cy, this);
+	}
+}
+
+void Cf3MapObjectBase::UpdateCPosAll()
+{
+	for(set<Cf3MapObjectBase*>::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
+		if ((*it)->m_bValid) (*it)->UpdateCPos();
 	}
 }

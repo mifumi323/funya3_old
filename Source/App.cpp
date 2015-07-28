@@ -55,7 +55,7 @@ class CAppMainWindow : public CAppBase {	//	アプリケーションクラスから派生
 
 bool DirCheck() {
 	CFile file;
-	while (file.Open("resource/main.gif", "r")) {
+	while (file.Read("resource/main.gif")) {
 		if (MessageBox(NULL,
 			"必要なファイルが見つかりません。\nふにゃさんをインストールしたフォルダを指定してください。",
 			"エラー", MB_OKCANCEL)!=IDOK) return false;

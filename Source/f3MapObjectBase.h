@@ -19,6 +19,8 @@ enum f3MapObjectDirection {
 };
 
 enum f3MapObjectID {
+	OID_UNKNOWN,
+
 	OID_FUNYA,
 	OID_BANANA,
 	OID_NEEDLE,
@@ -27,6 +29,9 @@ enum f3MapObjectID {
 	OID_ICE,
 	OID_ICESOURCE,
 	OID_FIRE,
+	OID_EFFECT,
+
+	OID_COUNT
 };
 
 class Cf3MapObjectBase
@@ -43,13 +48,16 @@ protected:
 	static Cf3Map*	m_pParent;
 	static set<Cf3MapObjectBase*> m_CharaList;
 public:
+	static int Count() { return m_CharaList.size();}
+	static void UpdateCPosAll();
+	virtual void UpdateCPos();
 	static void KillAll();
 	virtual void Synergy(){}				// é©î≠ìIëäå›çÏóp(ïKÇ∏é©å»äÆåãÇ∑ÇÈÇ±Ç∆)
-	void GetCPos(int& x, int& y);
+	virtual void GetCPos(int& x, int& y);
 	float GetDistanceSquare(Cf3MapObjectBase& obj);
 	float GetDistance(Cf3MapObjectBase& obj);
 	static	void Garbage();
-	static void SetParent(Cf3Map*lp);
+	static void SetParent(Cf3Map*lp) { m_pParent = lp; }
 	virtual void SynergyAll() {}
 	virtual	void OnKillAll() {}
 	virtual	void OnPreDrawAll() {}
@@ -58,7 +66,7 @@ public:
 	virtual	void OnPreDraw() {}
 	virtual	void OnDraw(CDIB32 *lp) {}
 	virtual	void OnMove() {}
-	virtual	void Kill() { m_bValid = false; }
+	virtual	void Kill();
 	bool	IsValid() { return m_bValid; }
 	void SetPos(float x,float y) { m_X = x; m_Y = y; }
 	void GetPos(float&x,float&y) { x = m_X; y = m_Y; }
@@ -68,6 +76,9 @@ public:
 
 	Cf3MapObjectBase();
 	virtual ~Cf3MapObjectBase();
+
+	Cf3MapObjectBase* m_pNext;
+	int m_nCX, m_nCY;
 
 };
 

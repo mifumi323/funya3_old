@@ -14,12 +14,10 @@
 class Cf3MapObjectBanana : public Cf3MapObjectBase  
 {
 protected:
-/*	static CDIB32	m_Graphic;
-	static bool		m_bGraphicInitialize;
-	CDIBResource m_Graphic;*/
 	CDIB32* m_Graphic;
 	static set<Cf3MapObjectBanana*> m_BananaList;
 public:
+	void UpdateCPos() {}
 	static void OnPreDrawAll();
 	static void SynergyAll();
 	static void OnDrawAll(CDIB32 *lp);

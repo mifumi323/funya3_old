@@ -13,9 +13,6 @@
 #include "yaneSDK/yaneDIB32.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectNeedle::m_Graphic;
-bool Cf3MapObjectNeedle::m_bGraphicInitialize = false;*/
-
 set<Cf3MapObjectNeedle*> Cf3MapObjectNeedle::m_EnemyList;
 
 //////////////////////////////////////////////////////////////////////
@@ -135,20 +132,17 @@ void Cf3MapObjectNeedle::OnMove()
 void Cf3MapObjectNeedle::Synergy()
 {
 	if (!m_bValid) return;
-	Reaction(m_pParent->GetMainChara());
-	for(set<Cf3MapObjectmrframe*>::iterator mf = Cf3MapObjectmrframe::IteratorBegin();
-	mf!=Cf3MapObjectmrframe::IteratorEnd();mf++){
-		if ((*mf)->IsValid()) Reaction((*mf));
+	Cf3MapObjectBase**it;
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+10, OID_FUNYA); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(set<Cf3MapObjectGeasprin*>::iterator gs = Cf3MapObjectGeasprin::IteratorBegin();
-	gs!=Cf3MapObjectGeasprin::IteratorEnd();gs++){
-		if ((*gs)->IsValid()) Reaction((*gs));
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+10, OID_GEASPRIN); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(set<Cf3MapObjectEelPitcher*>::iterator ep = Cf3MapObjectEelPitcher::IteratorBegin();
-	ep!=Cf3MapObjectEelPitcher::IteratorEnd();ep++){
-		if ((*ep)->IsValid()) {
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+		if ((*it)->IsValid()) {
 			float objX, objY;
-			(*ep)->GetPos(objX,objY);
+			(*it)->GetPos(objX,objY);
 			if (IsIn(objX-16,m_X,objX+16)) {
 				if (IsIn(objY,m_Y,objY+40)) {
 					// êHÇ◊ÇÁÇÍÇøÇ·Ç¡ÇΩÅIÅI
@@ -185,31 +179,37 @@ void Cf3MapObjectNeedle::Reaction(Cf3MapObjectBase *obj)
 void Cf3MapObjectNeedle::OnMoveAll()
 {
 	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnMove();
+		if ((*it)->m_bValid) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectNeedle::SynergyAll()
 {
 	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->IsValid())
-			(*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
 void Cf3MapObjectNeedle::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectNeedle::OnDrawAll(CDIB32 *lp)
 {
-	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+	int sx, sy, ex, ey;
+	sx = sy = 0;
+	m_pParent->GetViewPos(sx,sy);
+	sx = (-sx)>>5; sy = (-sy)>>5;
+	ex = sx+320/32; ey = sy+224/32;
+	Saturate(sx,ex,m_pParent->GetWidth()-1);
+	Saturate(sy,ey,m_pParent->GetHeight()-1);
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx, sy, ex, ey, OID_NEEDLE); (*it)!=NULL; it++) {
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
+/*	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	}*/
 }

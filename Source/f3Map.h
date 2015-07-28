@@ -46,12 +46,19 @@ private:
 	float			m_ScrollRX, m_ScrollRY;
 
 	float			*m_Wind;
+	Cf3MapObjectBase**m_pObject;
+	vector<Cf3MapObjectBase*> m_NearObject;
 
 	Cf3MapObjectMain*	m_MainChara;
 
 	static int m_nEffect;
 	CDIB32* m_pDIBBuf;
 public:
+	Cf3MapObjectBase** GetMapObjects(int x1, int y1, int x2, int y2, int id);
+	int GetIndex(int level, int x, int y) { return x+y*m_Width[level]; }
+	int GetIndex(int x, int y) { return x+y*m_Width[1]; }
+	void AddMapObject(int x, int y, Cf3MapObjectBase *p);
+	void RemoveMapObject(int x, int y, Cf3MapObjectBase*p);
 	CDIB32* ReadMapChip(Cf3StageFile*lp, int level);
 	bool IsPlayable() { return m_bPlayable; }
 	BYTE GetHeight(int level=1) { return m_Height[level]; }

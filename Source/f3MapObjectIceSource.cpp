@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "f3MapObjectIceSource.h"
+#include "f3Map.h"
 #include "App.h"
 
 set<Cf3MapObjectIceSource*> Cf3MapObjectIceSource::m_IceList;
@@ -44,25 +45,30 @@ void Cf3MapObjectIceSource::OnPreDraw()
 
 void Cf3MapObjectIceSource::OnDrawAll(CDIB32 *lp)
 {
-	for(set<Cf3MapObjectIceSource*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+	int sx, sy, ex, ey;
+	sx = sy = 0;
+	m_pParent->GetViewPos(sx,sy);
+	sx = (-sx)>>5; sy = (-sy)>>5;
+	ex = sx+320/32; ey = sy+224/32;
+	Saturate(sx,ex,m_pParent->GetWidth()-1);
+	Saturate(sy,ey,m_pParent->GetHeight()-1);
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, OID_ICESOURCE); (*it)!=NULL; it++) {
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
+/*	for(set<Cf3MapObjectIceSource*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
+		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	}*/
 }
 
 void Cf3MapObjectIceSource::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectIceSource*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->m_bValid) (*it)->OnPreDraw();
 	}
 }
 
 int Cf3MapObjectIceSource::GetSize()
 {
-/*	int s = floor(sin((2*3.141592653589793238/PHASEMAX)*m_Phase)*2+6);
-	if (s>7) s=7;
-	if (s<0) s=0;*/
 	int s=abs((PHASEMAX/2)-m_Phase)*6/PHASEMAX+4;
 	return s;
 }

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "f3Map.h"
 #include "yaneSDK/yaneDIB32.h"
+#include "yaneSDK/yaneTextDIB32.h"
 #include "yaneSDK/yaneDir.h"
 #include "yaneSDK/yaneFile.h"
 #include "yaneSDK/yanePlaneEffectBlt.h"
@@ -52,7 +53,6 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	BYTE* buf;
 	DWORD s;
 	DWORD bgm[BGMN_SIZE] = {0};
-//	string ChipFile = "";
 	m_pDIBBuf = new CDIB32;
 	m_pDIBBuf->CreateSurface(320,240);
 	m_Stage = stage;
@@ -60,6 +60,7 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	Cf3MapObjectBase::SetParent(this);
 	m_nGotBanana = m_nTotalBanana = 0;
 	m_Wind = NULL;
+	m_pObject = NULL;
 	// キャラ
 	m_MainChara = NULL;
 	// タイトル
@@ -74,61 +75,13 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	m_MapChip[0] = ReadMapChip(lp, 0);
 	m_MapChip[1] = ReadMapChip(lp, 1);
 	m_MapChip[2] = ReadMapChip(lp, 2);
-/*	m_MapChip[0]->Load("resource/Cave.bmp",false);
-	m_MapChip[1]->Load("resource/Cave.bmp",false);
-	m_MapChip[2]->Load("resource/Cave.bmp",false);
-	if ((buf = lp->GetStageData(0x3046434D,&s))!=NULL) {
-		char fn[256];
-		CopyMemory(fn,buf,s);
-		fn[s]='\0';
-		if ((buf = lp->GetStageData(0x3044434D,&s))!=NULL) {
-			// 勝手にファイル差し替えられる恐れがあるためステージ内部データを優先
-			char fn2[256];
-			::wsprintf(fn2,"!%x,%x",buf,s);
-			if (m_MapChip[0]->Load(fn2,false)) m_MapChip[0]->Load(fn,false);
-		}else{
-			m_MapChip[0]->Load(fn,false);
-		}
-	}
-	if ((buf = lp->GetStageData(0x3146434D,&s))!=NULL) {
-		char fn[256];
-		CopyMemory(fn,buf,s);
-		fn[s]='\0';
-		ChipFile = fn;
-		if ((buf = lp->GetStageData(0x3144434D,&s))!=NULL) {
-			// 勝手にファイル差し替えられる恐れがあるためステージ内部データを優先
-			char fn2[256];
-			::wsprintf(fn2,"!%x,%x",buf,s);
-			if (m_MapChip[1]->Load(fn2,false)) m_MapChip[1]->Load(fn,false);
-		}else{
-			m_MapChip[1]->Load(fn,false);
-		}
-	}
-	if ((buf = lp->GetStageData(0x3246434D,&s))!=NULL) {
-		char fn[256];
-		CopyMemory(fn,buf,s);
-		fn[s]='\0';
-		if ((buf = lp->GetStageData(0x3244434D,&s))!=NULL) {
-			// 勝手にファイル差し替えられる恐れがあるためステージ内部データを優先
-			char fn2[256];
-			::wsprintf(fn2,"!%x,%x",buf,s);
-			if (m_MapChip[2]->Load(fn2,false)) m_MapChip[2]->Load(fn,false);
-		}else{
-			m_MapChip[2]->Load(fn,false);
-		}
-	}*/
 	// 当たり判定
 	CopyMemory(m_Hit,m_defHit,240);
 	if ((buf = lp->GetStageData(CT_HITS,&s))!=NULL) {
 		if (s>240) s=240;
 		CopyMemory(m_Hit,buf,s);
-/*	}ef(CDir().IsFileExist(ChipFile+".f3h")) {
-		CFile hitfile;
-		if (hitfile.Read(ChipFile+".f3h")==0) {
-			CopyMemory(m_Hit,hitfile.GetMemory(),min(hitfile.GetSize(),240));
-		}*/
 	}
-	// マップデータ
+	// マップデータ(下層)
 	if ((buf = lp->GetStageData(GetChunkType(CT_M000,stage),&s))!=NULL) {
 		m_Width[0] = *buf;
 		m_Height[0] = *(buf+1);
@@ -137,12 +90,15 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	}else{
 		m_MapData[0] = NULL;
 	}
+	// マップデータ(中層)
 	if ((buf = lp->GetStageData(GetChunkType(CT_M100,stage),&s))!=NULL) {
 		m_Width[1] = *buf;
 		m_Height[1] = *(buf+1);
 		DWORD stagesize = m_Width[1]*m_Height[1];
 		m_MapData[1] = new BYTE[stagesize];
 		m_Wind = new float[stagesize];
+		m_pObject = new Cf3MapObjectBase*[stagesize];
+		ZeroMemory(m_pObject, stagesize*sizeof(Cf3MapObjectBase*));
 		BYTE *windmap = new BYTE[stagesize];
 		CopyMemory(m_MapData[1],buf+2,stagesize);
 		int x,y,z,n;
@@ -232,9 +188,11 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 			}
 		}
 		DELETEPTR_SAFE(windmap);
+		Cf3MapObjectBase::UpdateCPosAll();
 	}else{
 		m_MapData[1] = NULL;
 	}
+	// マップデータ(上層)
 	if ((buf = lp->GetStageData(GetChunkType(CT_M200,stage),&s))!=NULL) {
 		m_Width[2] = *buf;
 		m_Height[2] = *(buf+1);
@@ -260,6 +218,7 @@ Cf3Map::~Cf3Map()
 {
 	KillAllMapObject();
 	GarbageMapObject();
+	DELETEPTR_SAFE(m_pObject);
 	DELETEPTR_SAFE(m_Wind);
 	DELETEPTR_SAFE(m_MapData[2]);
 	DELETEPTR_SAFE(m_MapData[1]);
@@ -282,7 +241,7 @@ void Cf3Map::OnDraw(CDIB32 *lp)
 		if (m_Width[1]-10>0) mx = (float)(m_Width[0]-10)/(float)(m_Width[1]-10);
 		float my = 1;
 		if (m_Height[1]-7>0) my = (float)(m_Height[0]-7)/(float)(m_Height[1]-7);
-		sx = 0; sy = 0;
+		sx = sy = 0;
 		GetViewPos(sx,sy,mx,my);
 		sx = (-sx)>>5; sy = (-sy)>>5;
 		ex = sx+320/32; ey = sy+224/32;
@@ -302,7 +261,7 @@ void Cf3Map::OnDraw(CDIB32 *lp)
 		}
 	}
 	if (m_MapData[1]) {
-		sx = 0; sy = 0;
+		sx = sy = 0;
 		GetViewPos(sx,sy);
 		sx = (-sx)>>5; sy = (-sy)>>5;
 		ex = sx+320/32; ey = sy+224/32;
@@ -333,12 +292,39 @@ void Cf3Map::OnDraw(CDIB32 *lp)
 	Cf3MapObjectIce::OnDrawAll(lp);
 	Cf3MapObjectEffect::OnDrawAll(lp);
 	Cf3MapObjectWind::OnDrawAll(lp);
+/*	// デバッグ
+	if (m_MapData[1]) {
+		CTextDIB32 t;
+		sx = sy = 0;
+		GetViewPos(sx,sy);
+		sx = (-sx)>>5; sy = (-sy)>>5;
+		ex = sx+320/32; ey = sy+224/32;
+		Saturate(sx,ex,m_Width[1]-1);
+		Saturate(sy,ey,m_Height[1]-1);
+		for (y=sy; y<=ey; y++) {
+			for (x=sx; x<=ex; x++) {
+				z = y*m_Width[1]+x;
+				vx = x*32; vy = y*32;
+				GetViewPos(vx,vy);
+				if (m_pObject[z]) {
+					Cf3MapObjectBase*p=m_pObject[z];
+					int q=0;
+					while (p) {
+						t.GetFont()->SetText(p->GetID());
+						t.UpdateText();
+						lp->Blt(&t, vx+q*4, vy+q*4);
+						q++; p = p->m_pNext;
+					}
+				}
+			}
+		}
+	}*/
 	if (m_MapData[2]) {
 		float mx = 1;
 		if (m_Width[1]-10>0) mx = (float)(m_Width[2]-10)/(m_Width[1]-10);
 		float my = 1;
 		if (m_Height[1]-7>0) my = (float)(m_Height[2]-7)/(m_Height[1]-7);
-		sx = 0; sy = 0;
+		sx = sy = 0;
 		GetViewPos(sx,sy,mx,my);
 		sx = (-sx)>>5; sy = (-sy)>>5;
 		ex = sx+320/32; ey = sy+224/32;
@@ -385,7 +371,7 @@ bool Cf3Map::GetHit(int x, int y, BYTE hit)
 BYTE Cf3Map::GetMapData(int level, int x, int y)
 {
 	if (level<0 || 2<level || x<0 || m_Width[level]<=x || y<0 || m_Height[level]<=y) return 0;
-	return m_MapData[level][x+y*m_Width[level]];
+	return m_MapData[level][GetIndex(level, x, y)];
 }
 
 void Cf3Map::OnMove()
@@ -397,6 +383,7 @@ void Cf3Map::OnMove()
 	Cf3MapObjectNeedle::OnMoveAll();
 	Cf3MapObjectIce::OnMoveAll();
 	Cf3MapObjectFire::OnMoveAll();
+	Cf3MapObjectBase::UpdateCPosAll();
 	if (m_MainChara != NULL) m_MainChara->Synergy();
 	Cf3MapObjectBanana::SynergyAll();
 	Cf3MapObjectEelPitcher::SynergyAll();
@@ -470,7 +457,7 @@ long Cf3Map::GetChunkType(long type, int stage)
 float Cf3Map::GetWind(int x, int y)
 {
 	if (m_Wind==NULL || x<0 || m_Width[1]<=x || y<0 || m_Height[1]<=y) return 0.0f;
-	return m_Wind[x+y*m_Width[1]];
+	return m_Wind[GetIndex(x, y)];
 }
 
 void Cf3Map::CreateTemparatureMap(CDIB32 *dib)
@@ -566,4 +553,65 @@ CDIB32* Cf3Map::ReadMapChip(Cf3StageFile *lp, int level)
 	}
 	dib->Load("resource/Cave.bmp",false);
 	return dib;
+}
+
+void Cf3Map::AddMapObject(int x, int y, Cf3MapObjectBase *p)
+{
+	if (p==NULL) return;
+	Saturate(0, x, m_Width[1]-1);
+	Saturate(0, y, m_Height[1]-1);
+	int i = GetIndex(x, y);
+	Cf3MapObjectBase* o=m_pObject[i];
+	if (o==NULL) {
+		m_pObject[i] = p;
+		return;
+	}
+	while (o!=p) {
+		if (o->m_pNext==NULL) {
+			o->m_pNext = p;
+			return;
+		}
+		o = o->m_pNext;
+	}
+}
+
+void Cf3Map::RemoveMapObject(int x, int y, Cf3MapObjectBase *p)
+{
+	if (p==NULL) return;
+	Saturate(0, x, m_Width[1]-1);
+	Saturate(0, y, m_Height[1]-1);
+	int i = GetIndex(x, y);
+	Cf3MapObjectBase* o=m_pObject[i];
+	if (o==p) o = m_pObject[i] = p->m_pNext;
+	while (o!=NULL) {
+		if (o->m_pNext==p) o->m_pNext = p->m_pNext;
+		o = o->m_pNext;
+	}
+	p->m_pNext = NULL;
+}
+
+Cf3MapObjectBase** Cf3Map::GetMapObjects(int x1, int y1, int x2, int y2, int id)
+{
+	if (x1<0) x1 = 0;
+	if (y1<0) y1 = 0;
+	if (x2>=m_Width[1]) x2 = m_Width[1]-1;
+	if (y2>=m_Height[1]) y2 = m_Height[1]-1;
+	if (m_NearObject.size()<=Cf3MapObjectBase::Count())
+		m_NearObject.resize(Cf3MapObjectBase::Count()+1);
+	int i=0;
+	m_NearObject[0] = NULL;
+	Cf3MapObjectBase* o;
+	for (int x=x1; x<=x2; x++) {
+		for (int y=y1; y<=y2; y++) {
+			o = m_pObject[GetIndex(x, y)];
+			while (o!=NULL) {
+				if (o->GetID()==id) {
+					m_NearObject[i++] = o;
+					m_NearObject[i] = NULL;
+				}
+				o = o->m_pNext;
+			}
+		}
+	}
+	return &m_NearObject.front();
 }
