@@ -6,6 +6,7 @@
 #include "f3MapObjectBase.h"
 #include "f3Map.h"
 
+int Cf3MapObjectBase::m_nNextID = 0;
 Cf3Map* Cf3MapObjectBase::m_pParent = NULL;
 set<Cf3MapObjectBase*> Cf3MapObjectBase::m_CharaList;
 
@@ -19,7 +20,8 @@ Cf3MapObjectBase::Cf3MapObjectBase()
 	m_bValid = true;
 	m_X = m_Y = 0;
 	m_nScrollX = m_nScrollY = 1.0f;	// 標準でスクロールに完全についてゆく
-	m_nID = OID_UNKNOWN;
+	m_nType = OID_UNKNOWN;
+	m_nID = m_nNextID++;
 	m_pNext = NULL;
 	m_nCX = m_nCY = -1;
 }

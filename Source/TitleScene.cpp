@@ -95,7 +95,11 @@ void CTitleScene::OnDraw(CDIB32 *lp)
 	m_Map->OnDraw(lp);
 	int w,h;
 	m_TextStageFile->GetSize(w,h);
-	lp->Blt(m_TextStageFile,160-w/2,120-24-h);
+	if (w<=320) lp->Blt(m_TextStageFile,160-w/2,120-24-h/2);
+	else {
+		SIZE sz = { 320, h*320/w };
+		lp->Blt(m_TextStageFile,0,120-24-sz.cy/2,NULL, &sz);
+	}
 	m_NavigationBar->OnDraw(lp);
 }
 
@@ -125,8 +129,8 @@ void CTitleScene::SetStage()
 	DWORD size;
 	char*str=(char*)m_StageFile->GetStageData(CT_TITL,&size);
 	if (str>0 && size>0) {
-		char strbuf[21]={0};	// 0‚Å‰Šú‰»
-		size = min(size,20);
+		char strbuf[256]={0};	// 0‚Å‰Šú‰»
+		size = min(size,255);
 		CopyMemory(strbuf,str,size);
 		m_TextStageFile->GetFont()->SetText(strbuf);
 	}else{

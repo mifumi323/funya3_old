@@ -14,10 +14,8 @@
 #include "yaneSDK/yaneDIB32.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectGeasprin::m_Graphic;
-bool Cf3MapObjectGeasprin::m_bGraphicInitialize = false;*/
-
-set<Cf3MapObjectGeasprin*> Cf3MapObjectGeasprin::m_EnemyList;
+map<int, Cf3MapObjectGeasprin*> Cf3MapObjectGeasprin::m_EnemyList;
+//set<Cf3MapObjectGeasprin*> Cf3MapObjectGeasprin::m_EnemyList;
 
 const WalkDelay = 10;
 
@@ -27,12 +25,7 @@ const WalkDelay = 10;
 
 Cf3MapObjectGeasprin::Cf3MapObjectGeasprin(int nCX, int nCY, f3MapObjectDirection direction)
 {
-	m_EnemyList.insert(this);
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/Geasprin.gif");
-		m_bGraphicInitialize = true;
-	}
-	m_Graphic.Open("resource/Geasprin.gif");*/
+	m_EnemyList.insert(pair<int, Cf3MapObjectGeasprin*>(m_nID, this));
 	m_Graphic = ResourceManager.Get(RID_GEASPRIN);
 	SetPos(nCX*32+16,nCY*32+16);
 	SetID(OID_GEASPRIN);
@@ -43,7 +36,7 @@ Cf3MapObjectGeasprin::Cf3MapObjectGeasprin(int nCX, int nCY, f3MapObjectDirectio
 
 Cf3MapObjectGeasprin::~Cf3MapObjectGeasprin()
 {
-	m_EnemyList.erase(this);
+	m_EnemyList.erase(m_nID);
 }
 
 void Cf3MapObjectGeasprin::OnDraw(CDIB32 *lp)
@@ -336,22 +329,22 @@ void Cf3MapObjectGeasprin::Jump()
 
 void Cf3MapObjectGeasprin::OnMoveAll()
 {
-	for(set<Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+	for(map<int, Cf3MapObjectGeasprin*>::iterator it=m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->m_bValid) (*it).second->OnMove();
 	}
 }
 
 void Cf3MapObjectGeasprin::SynergyAll()
 {
-	for(set<Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->IsValid()) (*it)->Synergy();
+	for(map<int, Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->IsValid()) (*it).second->Synergy();
 	}
 }
 
 void Cf3MapObjectGeasprin::OnPreDrawAll()
 {
-	for(set<Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+	for(map<int, Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->m_bValid) (*it).second->OnPreDraw();
 	}
 }
 

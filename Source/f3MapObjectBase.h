@@ -43,7 +43,8 @@ protected:
 	float			m_nScrollX, m_nScrollY;	// ÉXÉNÉçÅ[ÉãÇ…Ç«ÇÍÇŸÇ«âeãøÇ≥ÇÍÇÈÇ©%
 
 	bool			m_bValid;
-	int				m_nID;
+	int				m_nType, m_nID;
+	static int		m_nNextID;
 
 	static Cf3Map*	m_pParent;
 	static set<Cf3MapObjectBase*> m_CharaList;
@@ -71,8 +72,8 @@ public:
 	void SetPos(float x,float y) { m_X = x; m_Y = y; }
 	void GetPos(float&x,float&y) { x = m_X; y = m_Y; }
 
-	virtual	void	SetID(int nID) { m_nID = nID; }
-	virtual	int		GetID() { return m_nID; }
+	virtual	void	SetID(int nID) { m_nType = nID; }
+	virtual	int		GetID() { return m_nType; }
 
 	Cf3MapObjectBase();
 	virtual ~Cf3MapObjectBase();

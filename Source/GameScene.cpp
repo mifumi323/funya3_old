@@ -238,7 +238,13 @@ void CGameScene::OnDraw(CDIB32 *lp)
 		int w,h,sw,sh;
 		m_Message->GetSize(w,h);
 		m_Select->GetSize(sw,sh);
-		if (!f3Input.GetKeyPressed(F3KEY_SMILE)) lp->Blt(m_Message,160-w/2,120-sh/2-h/2);
+		if (!f3Input.GetKeyPressed(F3KEY_SMILE)) {
+			if (w<=320) lp->Blt(m_Message,160-w/2,120-sh/2-h/2);
+			else {
+				SIZE sz = { 320, h*320/w };
+				lp->Blt(m_Message,0,120-sh/2-sz.cy/2,NULL, &sz);
+			}
+		}
 		m_MessageCount--;
 	}
 }

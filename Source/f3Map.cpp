@@ -67,6 +67,7 @@ Cf3Map::Cf3Map(Cf3StageFile*lp,int stage,bool playable)
 	m_Title = "";
 	if ((buf = lp->GetStageData(GetChunkType(CT_TL00,stage),&s))!=NULL) {
 		char tl[256];
+		s = min(s,255);
 		CopyMemory(tl,buf,s);
 		tl[s]='\0';
 		m_Title = tl;

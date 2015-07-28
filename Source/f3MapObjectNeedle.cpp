@@ -133,13 +133,13 @@ void Cf3MapObjectNeedle::Synergy()
 {
 	if (!m_bValid) return;
 	Cf3MapObjectBase**it;
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+10, OID_FUNYA); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, OID_FUNYA); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+10, OID_GEASPRIN); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, OID_GEASPRIN); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);

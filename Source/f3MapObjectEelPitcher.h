@@ -17,7 +17,7 @@ protected:
 	void Freeze() { m_State = EELFROZEN; m_Delay = 80; }
 	void Seed();
 	CDIB32* m_Graphic;
-	static set<Cf3MapObjectEelPitcher*> m_EnemyList;
+	static map<int, Cf3MapObjectEelPitcher*> m_EnemyList;
 
 	f3MapObjectDirection m_Direction;
 	int m_Level;						// ç≈ëÂçÇÇ≥
@@ -38,8 +38,8 @@ public:
 	static void OnPreDrawAll();
 	static void SynergyAll();
 	static void OnMoveAll();
-	static set<Cf3MapObjectEelPitcher*>::iterator IteratorBegin() { return m_EnemyList.begin(); }
-	static set<Cf3MapObjectEelPitcher*>::iterator IteratorEnd(){ return m_EnemyList.end(); }
+	static map<int, Cf3MapObjectEelPitcher*>::iterator IteratorBegin() { return m_EnemyList.begin(); }
+	static map<int, Cf3MapObjectEelPitcher*>::iterator IteratorEnd(){ return m_EnemyList.end(); }
 	void Reaction(Cf3MapObjectBase *obj);
 	void Synergy();
 	void OnMove();

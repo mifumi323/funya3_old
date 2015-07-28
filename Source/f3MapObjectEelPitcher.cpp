@@ -14,7 +14,7 @@
 #include "App.h"
 #include "ResourceManager.h"
 
-set<Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
+map<int, Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
 
 //////////////////////////////////////////////////////////////////////
 // ç\íz/è¡ñ≈
@@ -22,7 +22,7 @@ set<Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
 
 Cf3MapObjectEelPitcher::Cf3MapObjectEelPitcher(int nCX, int nCY)
 {
-	m_EnemyList.insert(this);
+	m_EnemyList.insert(pair<int, Cf3MapObjectEelPitcher*>(m_nID, this));
 	m_Graphic = ResourceManager.Get(RID_EELPITCHER);
 	m_Delay = 0;
 	m_Level = 1;
@@ -35,7 +35,7 @@ Cf3MapObjectEelPitcher::Cf3MapObjectEelPitcher(int nCX, int nCY)
 
 Cf3MapObjectEelPitcher::~Cf3MapObjectEelPitcher()
 {
-	m_EnemyList.erase(this);
+	m_EnemyList.erase(m_nID);
 }
 
 void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
@@ -327,28 +327,28 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 
 void Cf3MapObjectEelPitcher::OnMoveAll()
 {
-	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+	for(map<int, Cf3MapObjectEelPitcher*>::iterator it=m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->m_bValid) (*it).second->OnMove();
 	}
 }
 
 void Cf3MapObjectEelPitcher::SynergyAll()
 {
-	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->IsValid()) (*it)->Synergy();
+	for(map<int, Cf3MapObjectEelPitcher*>::iterator it=m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->IsValid()) (*it).second->Synergy();
 	}
 }
 
 void Cf3MapObjectEelPitcher::OnPreDrawAll()
 {
-	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+	for(map<int, Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->m_bValid) (*it).second->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectEelPitcher::OnDrawAll(CDIB32 *lp)
 {
-	for(set<Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+	for(map<int, Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
+		if ((*it).second->m_bValid) (*it).second->OnDraw(lp);
 	}
 }

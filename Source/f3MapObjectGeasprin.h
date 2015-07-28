@@ -21,11 +21,9 @@ protected:
 	void Laugh();
 	void Stop();
 	void Walk();
-/*	static CDIB32 m_Graphic;
-	static bool m_bGraphicInitialize;
-	CDIBResource m_Graphic;*/
 	CDIB32* m_Graphic;
-	static set<Cf3MapObjectGeasprin*> m_EnemyList;
+	static map<int, Cf3MapObjectGeasprin*> m_EnemyList;
+//	static set<Cf3MapObjectGeasprin*> m_EnemyList;
 
 	enum f3GeasprinState {
 		STANDING,	// —§‚¿
@@ -50,8 +48,8 @@ public:
 	static void OnPreDrawAll();
 	static void SynergyAll();
 	static void OnMoveAll();
-	static set<Cf3MapObjectGeasprin*>::iterator IteratorBegin() { return m_EnemyList.begin(); }
-	static set<Cf3MapObjectGeasprin*>::iterator IteratorEnd(){ return m_EnemyList.end(); }
+	static map<int, Cf3MapObjectGeasprin*>::iterator IteratorBegin() { return m_EnemyList.begin(); }
+	static map<int, Cf3MapObjectGeasprin*>::iterator IteratorEnd(){ return m_EnemyList.end(); }
 	void Reaction(Cf3MapObjectBase *obj);
 	void Synergy();
 	void SetPos(float x, float y);

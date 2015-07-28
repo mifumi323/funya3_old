@@ -293,7 +293,7 @@ Begin VB.Form FormMain
          Height          =   300
          ItemData        =   "FormMain.frx":08BD
          Left            =   120
-         List            =   "FormMain.frx":08CA
+         List            =   "FormMain.frx":08DE
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   16
          Top             =   1680
@@ -310,9 +310,9 @@ Begin VB.Form FormMain
       End
       Begin VB.ComboBox cmbBGMMode 
          Height          =   300
-         ItemData        =   "FormMain.frx":090A
+         ItemData        =   "FormMain.frx":091C
          Left            =   120
-         List            =   "FormMain.frx":0917
+         List            =   "FormMain.frx":0929
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   7
          Top             =   240
@@ -436,7 +436,7 @@ Private Sub cmbEffect_Click()
 End Sub
 
 Private Sub cmbFPS_Click()
-    FPS = 20 * (1 + cmbFPS.ListIndex)
+    FPS = cmbFPS.ItemData(cmbFPS.ListIndex)
 End Sub
 
 Private Sub cmbGravity_Click()
@@ -517,6 +517,11 @@ Private Sub Form_Load()
             .AddItem BGM.GetText(I)
         Next
         .ListIndex = 0
+    End With
+    With cmbFPS
+        For I = 0 To .ListCount - 1
+            .List(I) = "ゲームテンポ：" & .List(I) & "(" & .ItemData(I) & "FPS)"
+        Next
     End With
     ReDim Key(0)
     AddKey "KEY_PAUSE", "ポーズ・スタート"
@@ -749,9 +754,14 @@ Public Sub f3LoadSetting()
                 ElseIf l.IsMatch("FPS") Then
                     l.GetNum I
                     FPS = I
-                    If FPS = 20 Then cmbFPS.ListIndex = 0
-                    If FPS = 0 Or FPS = 40 Then cmbFPS.ListIndex = 1
-                    If FPS = 60 Then cmbFPS.ListIndex = 2
+                    With cmbFPS
+                        For I = 0 To .ListCount - 1
+                            If .ItemData(I) = FPS Then
+                                .ListIndex = I
+                                Exit For
+                            End If
+                        Next
+                    End With
                 
                 ElseIf l.IsMatch("EYEWITNESS") Then
                     l.GetNum I
