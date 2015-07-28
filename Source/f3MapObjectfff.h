@@ -13,17 +13,17 @@
 
 class Cf3MapObjectfff : public Cf3MapObjectMain  
 {
-protected:
+private:
 	void Tire();
 	void BreatheOut();
 	void BreatheIn();
 	void Freeze(int level=15);
 	void Die();
 	void HitCheck();
-	void Smile();
+	void Smile() { m_State=SMILE; }
 
-	CDIB32* m_Graphic;
-	CDIB32* m_Graphic2;
+//	CDIB32* m_Graphic;
+//	CDIB32* m_Graphic2;
 
 	float m_OldX, m_OldY;
 	float m_DX, m_DY, m_OldDX, m_OldDY;	// à íuÇ»Ç«ÇÃèÓïÒ
@@ -44,16 +44,16 @@ protected:
 	int m_PoseCounter, m_PoseCounter2;
 
 	// ï\é¶à íuí≤êÆ
-	int	m_VOffsetX,m_VOffsetY;
-	int	m_VOffsetToX,m_VOffsetToY;
+	int	m_VOffsetX, m_VOffsetY;
+	int	m_VOffsetToX, m_VOffsetToY;
 public:
 	bool IsFrozen() { return m_State==FROZEN; }
 	void Synergy();
-	bool IsDied();
+	bool IsDied() { return m_State==DEAD; }
 	void OnMove();
 	void OnDraw(CDIB32 *lp);
 	Cf3MapObjectfff(int nCX, int nCY);
-	virtual ~Cf3MapObjectfff();
+	~Cf3MapObjectfff() {}
 
 };
 

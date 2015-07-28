@@ -14,6 +14,7 @@ class CDIB32;
 class Cf3StageFile;
 class Cf3MapObjectBase;
 class Cf3MapObjectMain;
+enum f3MapObjectType;
 
 const BYTE HIT_TOP		= 0x01;
 const BYTE HIT_BOTTOM	= 0x02;
@@ -54,7 +55,7 @@ private:
 	static int m_nEffect;
 	CDIB32* m_pDIBBuf;
 public:
-	Cf3MapObjectBase** GetMapObjects(int x1, int y1, int x2, int y2, int id);
+	Cf3MapObjectBase** GetMapObjects(int x1, int y1, int x2, int y2, f3MapObjectType eType);
 	int GetIndex(int level, int x, int y) { return x+y*m_Width[level]; }
 	int GetIndex(int x, int y) { return x+y*m_Width[1]; }
 	void AddMapObject(int x, int y, Cf3MapObjectBase *p);

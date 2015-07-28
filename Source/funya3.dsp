@@ -142,10 +142,6 @@ SOURCE=.\f3MapObjectIceSource.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\f3MapObjectItem.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\f3MapObjectMain.cpp
 # End Source File
 # Begin Source File
@@ -632,10 +628,6 @@ SOURCE=.\f3MapObjectIceSource.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\f3MapObjectItem.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\f3MapObjectMain.h
 # End Source File
 # Begin Source File
@@ -689,10 +681,6 @@ SOURCE=.\FirstScene.h
 # Begin Source File
 
 SOURCE=.\GameScene.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\GameTitle.h
 # End Source File
 # Begin Source File
 

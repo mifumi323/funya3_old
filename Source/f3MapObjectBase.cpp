@@ -8,22 +8,22 @@
 
 int Cf3MapObjectBase::m_nNextID = 0;
 Cf3Map* Cf3MapObjectBase::m_pParent = NULL;
-set<Cf3MapObjectBase*> Cf3MapObjectBase::m_CharaList;
+MapObjectList Cf3MapObjectBase::m_CharaList;
 
 //////////////////////////////////////////////////////////////////////
 // 構築/消滅
 //////////////////////////////////////////////////////////////////////
 
-Cf3MapObjectBase::Cf3MapObjectBase()
+Cf3MapObjectBase::Cf3MapObjectBase(f3MapObjectType eType)
+	:m_bValid(true)
+	,m_eType(eType)
+	,m_X(0) ,m_Y(0)
+	,m_nCX(-1) ,m_nCY(-1)
+	,m_nID(m_nNextID++)
+	,m_pNext(NULL)
 {
 	m_CharaList.insert(this);
-	m_bValid = true;
-	m_X = m_Y = 0;
-	m_nScrollX = m_nScrollY = 1.0f;	// 標準でスクロールに完全についてゆく
-	m_nType = OID_UNKNOWN;
-	m_nID = m_nNextID++;
-	m_pNext = NULL;
-	m_nCX = m_nCY = -1;
+//	m_nScrollX = m_nScrollY = 1.0f;	// 標準でスクロールに完全についてゆく
 }
 
 Cf3MapObjectBase::~Cf3MapObjectBase()
@@ -40,14 +40,15 @@ void Cf3MapObjectBase::Kill()
 
 void Cf3MapObjectBase::SetViewPos(float offsetx, float offsety)
 {
-	m_nVX = m_X+offsetx;	m_nVY = m_Y+offsety;
-	if (m_pParent!=NULL) m_pParent->GetViewPos(m_nVX,m_nVY,m_nScrollX,m_nScrollY);
+	m_nVX = m_X+offsetx;
+	m_nVY = m_Y+offsety;
+	if (m_pParent!=NULL) m_pParent->GetViewPos(m_nVX, m_nVY);
 }
 
-float Cf3MapObjectBase::GetDistance(Cf3MapObjectBase &obj)
-{
-	return sqrt(GetDistanceSquare(obj));
-}
+//float Cf3MapObjectBase::GetDistance(Cf3MapObjectBase &obj)
+//{
+//	return sqrt(GetDistanceSquare(obj));
+//}
 
 float Cf3MapObjectBase::GetDistanceSquare(Cf3MapObjectBase& obj)
 {
@@ -63,7 +64,7 @@ void Cf3MapObjectBase::GetCPos(int &x, int &y)
 
 void Cf3MapObjectBase::Garbage()
 {
-	for(set<Cf3MapObjectBase*>::iterator it = m_CharaList.begin();it!=m_CharaList.end();){
+	for(MapObjectList::iterator it = m_CharaList.begin();it!=m_CharaList.end();){
 		if (!(*it)->IsValid()) {
 			Cf3MapObjectBase* lp = *it;
 			it++;
@@ -77,7 +78,7 @@ void Cf3MapObjectBase::Garbage()
 
 void Cf3MapObjectBase::KillAll()
 {
-	for(set<Cf3MapObjectBase*>::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
+	for(MapObjectList::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
 		if ((*it)->m_bValid) (*it)->Kill();
 	}
 }
@@ -94,7 +95,7 @@ void Cf3MapObjectBase::UpdateCPos()
 
 void Cf3MapObjectBase::UpdateCPosAll()
 {
-	for(set<Cf3MapObjectBase*>::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
+	for(MapObjectList::iterator it = m_CharaList.begin();it!=m_CharaList.end();it++){
 		if ((*it)->m_bValid) (*it)->UpdateCPos();
 	}
 }

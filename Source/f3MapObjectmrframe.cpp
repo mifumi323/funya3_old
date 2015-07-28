@@ -17,13 +17,13 @@ set<Cf3MapObjectmrframe*>	Cf3MapObjectmrframe::m_EnemyList;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectmrframe::Cf3MapObjectmrframe(int nCX, int nCY)
+	:Cf3MapObjectBase(MOT_FUNYA)
 {
 	m_EnemyList.insert(this);
 	m_funya = new Cf3MapObjectfunya(nCX,nCY);
-	m_CharaList.erase(m_funya);
+	RemoveCharaFromList(m_funya);
 	m_funya->m_bOriginal = false;
 	m_Graphic = ResourceManager.Get(RID_MRFRAME);
-	SetID(OID_FUNYA);
 	SetPos(m_funya->m_X,m_funya->m_Y);
 	m_nLife=100;
 }
@@ -36,7 +36,7 @@ Cf3MapObjectmrframe::~Cf3MapObjectmrframe()
 
 void Cf3MapObjectmrframe::OnDraw(CDIB32 *lp)
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (m_pParent->ItemCompleted()) m_funya->Smile();
 	int CX=0, CY=m_funya->m_Direction;
 	SetViewPos(-16,-15);
@@ -109,7 +109,7 @@ void Cf3MapObjectmrframe::Synergy()
 void Cf3MapObjectmrframe::OnMoveAll()
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+		if ((*it)->IsValid()) (*it)->OnMove();
 	}
 }
 
@@ -123,14 +123,14 @@ void Cf3MapObjectmrframe::SynergyAll()
 void Cf3MapObjectmrframe::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectmrframe::OnDrawAll(CDIB32 *lp)
 {
 	for(set<Cf3MapObjectmrframe*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnDraw(lp);
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
 }
 

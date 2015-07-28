@@ -15,9 +15,6 @@ class Cf3MapObjectNeedle : public Cf3MapObjectBase
 {
 protected:
 	void Reaction(Cf3MapObjectBase *obj);
-/*	static CDIB32	m_Graphic;
-	static bool		m_bGraphicInitialize;
-	CDIBResource m_Graphic;*/
 	CDIB32* m_Graphic;
 	static set<Cf3MapObjectNeedle*> m_EnemyList;
 

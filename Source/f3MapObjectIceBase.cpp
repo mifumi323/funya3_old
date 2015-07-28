@@ -7,25 +7,13 @@
 #include "yaneSDK/yaneDIB32.h"
 #include "ResourceManager.h"
 
-/*CDIB32 Cf3MapObjectIceBase::m_Graphic;
-bool Cf3MapObjectIceBase::m_bGraphicInitialize = false;*/
-
 //////////////////////////////////////////////////////////////////////
 // ç\íz/è¡ñ≈
 //////////////////////////////////////////////////////////////////////
 
-Cf3MapObjectIceBase::Cf3MapObjectIceBase()
+Cf3MapObjectIceBase::Cf3MapObjectIceBase(f3MapObjectType eType)
+	:Cf3MapObjectBase(eType)
 {
-/*	if (!m_bGraphicInitialize) {
-		m_Graphic.Load("resource/IceFire.bmp");
-		*m_Graphic.GetYGA() = true;
-		CDIB32 dib;
-		dib.Load("resource/IceFireMask.bmp");
-		m_Graphic.BltToAlpha(&dib,0,255);
-		m_bGraphicInitialize = true;
-		m_Graphic.SaveYGA("resource/IceFire.yga",NULL,false);
-	}
-	m_Graphic.Open("resource/IceFire.yga");*/
 	m_Graphic = ResourceManager.Get(RID_ICEFIRE);
 }
 

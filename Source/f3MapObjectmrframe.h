@@ -17,9 +17,6 @@ struct f3JumpFunction;
 class Cf3MapObjectmrframe : public Cf3MapObjectBase 
 {
 protected:
-/*	static CDIB32		m_Graphic;
-	static bool			m_bGraphicInitialize;
-	CDIBResource m_Graphic;*/
 	CDIB32* m_Graphic;
 
 	Cf3MapObjectfunya	*m_funya;

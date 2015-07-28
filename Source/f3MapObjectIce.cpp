@@ -26,12 +26,12 @@ const int LIFE = 160;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectIce::Cf3MapObjectIce(float x, float y, float dx, float dy)
+	:Cf3MapObjectIceBase(MOT_ICE)
 {
 	m_IceList.insert(this);
 	SetPos(x,y);
 	m_DX = dx; m_DY = dy;
 	m_Life=LIFE;
-	SetID(OID_ICE);
 }
 
 Cf3MapObjectIce::~Cf3MapObjectIce()
@@ -110,32 +110,29 @@ void Cf3MapObjectIce::OnDrawAll(CDIB32 *lp)
 	ex = sx+320/32; ey = sy+224/32;
 	Saturate(sx,ex,m_pParent->GetWidth()-1);
 	Saturate(sy,ey,m_pParent->GetHeight()-1);
-	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, OID_ICE); (*it)!=NULL; it++) {
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, MOT_ICE); (*it)!=NULL; it++) {
 		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
-/*	for(set<Cf3MapObjectIce*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnDraw(lp);
-	}*/
 }
 
 void Cf3MapObjectIce::OnMoveAll()
 {
 	for(set<Cf3MapObjectIce*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+		if ((*it)->IsValid()) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectIce::SynergyAll()
 {
 	for(set<Cf3MapObjectIce*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid) (*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
 void Cf3MapObjectIce::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectIce*>::iterator it = m_IceList.begin();it!=m_IceList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 

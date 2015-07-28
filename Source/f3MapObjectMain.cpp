@@ -7,17 +7,18 @@
 #include "f3MapObjectfunya.h"
 
 Cf3GameInput* Cf3MapObjectMain::m_pInput=NULL;
-Cf3GameInpuKey KeyInput;
-Cf3GameInpuReplay ReplayInput;
+Cf3GameInputKey KeyInput;
+Cf3GameInputReplay ReplayInput;
 
 void Cf3MapObjectMain::GetViewPos(int &vx, int &vy)
 {
-	vx = m_X;	vy = m_Y;
+	vx = m_X;
+	vy = m_Y;
 }
 
 bool Cf3MapObjectMain::IsDied()
 {
-	return m_bValid;
+	return IsValid();
 }
 
 Cf3MapObjectMain* Cf3MapObjectMain::Create(int x, int y)

@@ -20,11 +20,11 @@ set<Cf3MapObjectNeedle*> Cf3MapObjectNeedle::m_EnemyList;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectNeedle::Cf3MapObjectNeedle(int nCX, int nCY, int nType)
+	:Cf3MapObjectBase(MOT_NEEDLE)
 {
 	m_EnemyList.insert(this);
 	m_Graphic = ResourceManager.Get(RID_NEEDLE);
 	SetPos(nCX*32+16,nCY*32+17);
-	SetID(OID_NEEDLE);
 	switch(nType){
 	case 1:
 		m_Type = NDT_HORIZONTAL;
@@ -53,14 +53,14 @@ Cf3MapObjectNeedle::~Cf3MapObjectNeedle()
 
 void Cf3MapObjectNeedle::OnDraw(CDIB32 *lp)
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	SetViewPos(-15,-15);
 	lp->Blt(m_Graphic,m_nVX,m_nVY);
 }
 
 void Cf3MapObjectNeedle::OnMove()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (m_Type==NDT_UNDEFINED) {
 		// このタイミングで初期化
 		if (m_pParent->GetHit(floor(m_X/32),floor((m_Y+16)/32),HIT_TOP)) {
@@ -131,15 +131,15 @@ void Cf3MapObjectNeedle::OnMove()
 
 void Cf3MapObjectNeedle::Synergy()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	Cf3MapObjectBase**it;
-	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, OID_FUNYA); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, MOT_FUNYA); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, OID_GEASPRIN); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY, m_nCX+1, m_nCY+10, MOT_GEASPRIN); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, MOT_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -159,9 +159,9 @@ void Cf3MapObjectNeedle::Reaction(Cf3MapObjectBase *obj)
 	if (obj==NULL) return;
 	float objX, objY;
 	obj->GetPos(objX,objY);
-	switch(obj->GetID()) {
-	case OID_FUNYA:
-	case OID_GEASPRIN:{
+	switch(obj->GetType()) {
+	case MOT_FUNYA:
+	case MOT_GEASPRIN:{
 		if (m_Type!=NDT_VERTICAL || m_State!=NDS_STOP || m_Speed!=0) return;
 		if (IsIn(m_X-16,objX,m_X+16)) {
 			if (IsIn(m_Y+15,objY,m_Y+271)) {
@@ -179,7 +179,7 @@ void Cf3MapObjectNeedle::Reaction(Cf3MapObjectBase *obj)
 void Cf3MapObjectNeedle::OnMoveAll()
 {
 	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+		if ((*it)->IsValid()) (*it)->OnMove();
 	}
 }
 
@@ -193,7 +193,7 @@ void Cf3MapObjectNeedle::SynergyAll()
 void Cf3MapObjectNeedle::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 
@@ -206,7 +206,7 @@ void Cf3MapObjectNeedle::OnDrawAll(CDIB32 *lp)
 	ex = sx+320/32; ey = sy+224/32;
 	Saturate(sx,ex,m_pParent->GetWidth()-1);
 	Saturate(sy,ey,m_pParent->GetHeight()-1);
-	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx, sy, ex, ey, OID_NEEDLE); (*it)!=NULL; it++) {
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx, sy, ex, ey, MOT_NEEDLE); (*it)!=NULL; it++) {
 		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
 /*	for(set<Cf3MapObjectNeedle*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){

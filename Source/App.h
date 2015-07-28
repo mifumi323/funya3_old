@@ -33,7 +33,6 @@ public:
 	CApp();
 	virtual ~CApp();
 
-//	CDIBDraw*	GetDraw()		{ return& m_Draw; }
 	CDIB32*		GetDIB()		{ return theSetting->m_Zoom?&m_Backup:m_Draw.GetSecondary(); }
 	CBGMBase*	GetBGM()		{ return  m_BGM; }
 	CFPSTimer*	GetFPS()		{ return  m_FPS; }

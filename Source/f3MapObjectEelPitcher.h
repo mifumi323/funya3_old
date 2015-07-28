@@ -13,10 +13,10 @@
 
 class Cf3MapObjectEelPitcher : public Cf3MapObjectBase  
 {
-protected:
+private:
 	void Freeze() { m_State = EELFROZEN; m_Delay = 80; }
 	void Seed();
-	CDIB32* m_Graphic;
+//	CDIB32* m_Graphic;
 	static map<int, Cf3MapObjectEelPitcher*> m_EnemyList;
 
 	f3MapObjectDirection m_Direction;
@@ -29,9 +29,9 @@ protected:
 		EELFROZEN,
 		EELDEAD,
 	} m_State;
-	float m_DX, m_DY;
-	float m_RootX, m_RootY;				// ç™å≥
-	bool m_bBlinking;
+	float	m_DX, m_DY;
+	float	m_RootX, m_RootY;			// ç™å≥
+	bool	m_bBlinking;
 public:
 	bool IsLeaf() { return m_State==EELLEAF || m_State==EELFROZEN; }
 	static void OnDrawAll(CDIB32 *lp);
@@ -45,7 +45,7 @@ public:
 	void OnMove();
 	void OnDraw(CDIB32 *lp);
 	Cf3MapObjectEelPitcher(int nCX, int nCY);
-	virtual ~Cf3MapObjectEelPitcher();
+	~Cf3MapObjectEelPitcher();
 
 };
 

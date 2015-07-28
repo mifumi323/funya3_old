@@ -19,11 +19,11 @@ set<Cf3MapObjectFire*> Cf3MapObjectFire::m_FireList;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectFire::Cf3MapObjectFire(int x, int y)
+	:Cf3MapObjectIceBase(MOT_FIRE)
+	,m_Delay(0)
 {
 	m_FireList.insert(this);
 	SetPos(x*32+16,y*32+16);
-	SetID(OID_FIRE);
-	m_Delay = 0;
 	m_Phase = CApp::random(PHASEMAX);
 	m_Size = GetSize();
 }
@@ -42,33 +42,29 @@ void Cf3MapObjectFire::OnDrawAll(CDIB32 *lp)
 	ex = sx+320/32; ey = sy+224/32;
 	Saturate(sx,ex,m_pParent->GetWidth()-1);
 	Saturate(sy,ey,m_pParent->GetHeight()-1);
-	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, OID_FIRE); (*it)!=NULL; it++) {
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, MOT_FIRE); (*it)!=NULL; it++) {
 		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
-/*	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnDraw(lp);
-	}*/
 }
 
 void Cf3MapObjectFire::OnMoveAll()
 {
 	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnMove();
+		if ((*it)->IsValid()) (*it)->OnMove();
 	}
 }
 
 void Cf3MapObjectFire::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectFire::SynergyAll()
 {
 	for(set<Cf3MapObjectFire*>::iterator it = m_FireList.begin();it!=m_FireList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->Synergy();
+		if ((*it)->IsValid()) (*it)->Synergy();
 	}
 }
 
@@ -100,17 +96,12 @@ void Cf3MapObjectFire::OnPreDraw()
 	ef (m_Size>GetSize()) { m_Size--; }
 }
 
-bool Cf3MapObjectFire::IsActive()
-{
-	return m_Delay==0;
-}
-
 void Cf3MapObjectFire::Synergy()
 {
 	if (m_Delay==0) {
 		// ‚Ó‚É‚á
 		Cf3MapObjectBase**it;
-		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_FUNYA); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, MOT_FUNYA); (*it)!=NULL; it++){
 			if ((*it)->IsValid()&&((Cf3MapObjectMain*)(*it))->IsFrozen()) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);
@@ -118,27 +109,8 @@ void Cf3MapObjectFire::Synergy()
 				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) m_Delay = 200;
 			}
 		}
-/*		if (m_pParent->GetMainChara()->IsFrozen()) {
-			float objX, objY;
-			m_pParent->GetMainChara()->GetPos(objX,objY);
-			if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-				// ‚ ‚½‚Á‚½I
-				m_Delay = 200;
-			}
-		}
-		for(set<Cf3MapObjectmrframe*>::iterator mf = Cf3MapObjectmrframe::IteratorBegin();
-		mf!=Cf3MapObjectmrframe::IteratorEnd();mf++){
-			if ((*mf)->IsValid()&&(*mf)->IsFrozen()){
-				float objX, objY;
-				(*mf)->GetPos(objX,objY);
-				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-					// ‚ ‚½‚Á‚½I
-					m_Delay = 200;
-				}
-			}
-		}*/
 		// •X
-		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, OID_ICE); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-1, m_nCY-1, m_nCX+1, m_nCY+1, MOT_ICE); (*it)!=NULL; it++){
 			if ((*it)->IsValid()) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);
@@ -146,16 +118,5 @@ void Cf3MapObjectFire::Synergy()
 				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) m_Delay = 200;
 			}
 		}
-/*		for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
-		ic!=Cf3MapObjectIce::IteratorEnd();ic++){
-			if ((*ic)->IsValid()) {
-				float objX, objY;
-				(*ic)->GetPos(objX,objY);
-				if ((objX-m_X)*(objX-m_X)+(objY-m_Y)*(objY-m_Y)<256) {
-					// ‚ ‚½‚Á‚½I
-					m_Delay = 200;
-				}
-			}
-		}*/
 	}
 }

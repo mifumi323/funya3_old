@@ -371,9 +371,9 @@ void Cf3Map::OnDraw(CDIB32 *lp, bool bShowHit)
 		}
 	}*/
 	if (m_MapData[2]) {
-		float mx = 1;
+		float mx = 1.0f;
 		if (m_Width[1]-10>0) mx = (float)(m_Width[2]-10)/(m_Width[1]-10);
-		float my = 1;
+		float my = 1.0f;
 		if (m_Height[1]-7>0) my = (float)(m_Height[2]-7)/(m_Height[1]-7);
 		sx = sy = 0;
 		GetViewPos(sx,sy,mx,my);
@@ -445,7 +445,7 @@ void Cf3Map::OnMove()
 	Cf3MapObjectFire::SynergyAll();
 }
 
-void Cf3Map::GetViewPos(int &x, int &y, float scrollx,  float scrolly)
+void Cf3Map::GetViewPos(int &x, int &y, float scrollx, float scrolly)
 {
 	int offx = m_ScrollRX-320/2, offy = m_ScrollRY-224/2-2;
 	Saturate(0,offx,m_Width[1]*32-320);
@@ -641,7 +641,7 @@ void Cf3Map::RemoveMapObject(int x, int y, Cf3MapObjectBase *p)
 	p->m_pNext = NULL;
 }
 
-Cf3MapObjectBase** Cf3Map::GetMapObjects(int x1, int y1, int x2, int y2, int id)
+Cf3MapObjectBase** Cf3Map::GetMapObjects(int x1, int y1, int x2, int y2, f3MapObjectType eType)
 {
 	if (x1<0) x1 = 0;
 	if (y1<0) y1 = 0;
@@ -656,7 +656,7 @@ Cf3MapObjectBase** Cf3Map::GetMapObjects(int x1, int y1, int x2, int y2, int id)
 		for (int y=y1; y<=y2; y++) {
 			o = m_pObject[GetIndex(x, y)];
 			while (o!=NULL) {
-				if (o->GetID()==id&&o->IsValid()) {
+				if (o->GetType()==eType&&o->IsValid()) {
 					m_NearObject[i++] = o;
 					m_NearObject[i] = NULL;
 				}

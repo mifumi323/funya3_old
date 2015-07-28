@@ -51,12 +51,12 @@ const float MAXDISTANCE = 1.6e5f;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectfunya::Cf3MapObjectfunya(int nCX, int nCY)
+	:Cf3MapObjectMain(MOT_FUNYA)
 {
 	m_Graphic = ResourceManager.Get(RID_MAIN);
 	m_Graphic2 = ResourceManager.Get(RID_MAINICY);
-	SetID(OID_FUNYA);
-	m_DX = m_DY = 0;
-	m_ChargePower = 0;
+	m_DX = m_DY = 0.0f;
+	m_ChargePower = 0.0f;
 	m_ChargeDec = 0.001f;
 	m_nPower = 0;
 	m_Power = m_PowerX = m_PowerY = 0.0f;
@@ -71,13 +71,9 @@ Cf3MapObjectfunya::Cf3MapObjectfunya(int nCX, int nCY)
 	m_BananaDistance = 0.0f;
 }
 
-Cf3MapObjectfunya::~Cf3MapObjectfunya()
-{
-}
-
 void Cf3MapObjectfunya::OnDraw(CDIB32 *lp)
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (m_pParent->ItemCompleted()) Smile();
 	int CX=0, CY=m_Direction;
 	SetViewPos(-16,-15);
@@ -136,7 +132,7 @@ void Cf3MapObjectfunya::OnDraw(CDIB32 *lp)
 
 void Cf3MapObjectfunya::OnMove()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (!m_pParent->IsPlayable()) return;
 	if (m_bFirst) { HitCheck(); m_bFirst = false; }
 	float Wind = m_pParent->GetWind(floor(m_X/32),floor(m_Y/32));
@@ -425,7 +421,7 @@ void Cf3MapObjectfunya::Die()
 
 void Cf3MapObjectfunya::OnPreDraw()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	// PoseCounter‚Ìˆ—
 	if (m_State==STANDING) {	// —§‚Á‚Ä‚é‚Æ‚«
 	}ef(m_State==RUNNING) {
@@ -455,7 +451,7 @@ void Cf3MapObjectfunya::Synergy()
 	m_Power = m_PowerX = m_PowerY = 0.0f;
 	Cf3MapObjectBase**it;
 	// ƒMƒ„ƒoƒl
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_GEASPRIN); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_GEASPRIN); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -500,7 +496,7 @@ void Cf3MapObjectfunya::Synergy()
 	}
 	// ‚Æ‚°‚Æ‚°
 #if !INVINCITY
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_NEEDLE); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_NEEDLE); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -512,7 +508,7 @@ void Cf3MapObjectfunya::Synergy()
 	}
 #endif
 	// ƒEƒiƒMƒJƒYƒ‰
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()&&((Cf3MapObjectEelPitcher*)(*it))->IsLeaf()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -530,7 +526,7 @@ void Cf3MapObjectfunya::Synergy()
 	if (m_State!=FROZEN) {
 		// •X
 #if !INVINCITY
-		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_ICE); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_ICE); (*it)!=NULL; it++){
 			if ((*it)->IsValid()&&((Cf3MapObjectIce*)(*it))->GetSize()>10) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);

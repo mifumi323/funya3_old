@@ -33,7 +33,7 @@ protected:
 public:
 	void Quit() { DELETEPTR_SAFE(m_Resource); }
 	void Init();
-	CResourceManager() { m_Resource = NULL; }
+	CResourceManager() : m_Resource(NULL) {}
 	virtual ~CResourceManager() { Quit(); }
 
 	CDIB32* Get(int i) { return m_Resource+i; }

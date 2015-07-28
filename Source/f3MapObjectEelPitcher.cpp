@@ -21,21 +21,21 @@ map<int, Cf3MapObjectEelPitcher*>	Cf3MapObjectEelPitcher::m_EnemyList;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectEelPitcher::Cf3MapObjectEelPitcher(int nCX, int nCY)
+	:Cf3MapObjectBase(MOT_EELPITCHER)
+	,m_Delay(0)
+	,m_Level(1)
+	,m_DX(0), m_DY(0)
+	,m_State(EELSEED)
+	,m_bBlinking(false)
 {
-	m_EnemyList.insert(pair<int, Cf3MapObjectEelPitcher*>(m_nID, this));
-	m_Graphic = ResourceManager.Get(RID_EELPITCHER);
-	m_Delay = 0;
-	m_Level = 1;
+	m_EnemyList.insert(pair<int, Cf3MapObjectEelPitcher*>(GetID(), this));
+//	m_Graphic = ResourceManager.Get(RID_EELPITCHER);
 	SetPos(nCX*32+16,nCY*32+16);
-	m_DX = m_DY = 0;
-	m_State = EELSEED;
-	SetID(OID_EELPITCHER);
-	m_bBlinking = false;
 }
 
 Cf3MapObjectEelPitcher::~Cf3MapObjectEelPitcher()
 {
-	m_EnemyList.erase(m_nID);
+	m_EnemyList.erase(GetID());
 }
 
 void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
@@ -43,6 +43,7 @@ void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
 	SetViewPos(-16,-16);
 	int height = m_RootY-m_Y;
 	RECT rc;
+	CDIB32* graphic = ResourceManager.Get(RID_EELPITCHER);
 	if (m_State==EELLEAF || m_State==EELFROZEN) {
 		int offset1 = (m_State==EELLEAF?0:96);
 		int offset2 = (m_Direction==DIR_LEFT?32:64);
@@ -51,7 +52,7 @@ void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
 		int height1 = (height>=16?32:height+16);
 		rc.left=offset1+offset2;	rc.top = offset3;
 		rc.right=rc.left+32;		rc.bottom = rc.top+height1;
-		lp->Blt(m_Graphic,m_nVX,m_nVY,&rc);
+		lp->Blt(graphic,m_nVX,m_nVY,&rc);
 		// 茎
 		if (height>16) {
 			int i, h, h2;
@@ -63,7 +64,7 @@ void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
 				rc.right=rc.left+32;	rc.bottom = rc.top+h2;
 				// +0.5fは小数点以下四捨五入のため
 				SetViewPos(-16+(m_RootX-m_X)*(i-16)/(height-16)+0.5f,-16);
-				lp->Blt(m_Graphic,m_nVX,m_nVY+16+i,&rc);
+				lp->Blt(graphic,m_nVX,m_nVY+16+i,&rc);
 			}
 		}
 		SetViewPos(-16,-16);
@@ -72,31 +73,31 @@ void Cf3MapObjectEelPitcher::OnDraw(CDIB32 *lp)
 			int height3 = height-16;
 			rc.left=offset1+offset2;	rc.top = 80;
 			rc.right=rc.left+32;		rc.bottom = rc.top+height3;
-			lp->Blt(m_Graphic,m_nVX,m_nVY+32,&rc);
+			lp->Blt(graphic,m_nVX,m_nVY+32,&rc);
 		}ef(IsIn(33,height,48)) {
 			int height2 = height-32;
 			// ふくろ
 			rc.left=offset1+offset2;	rc.top = 64;
 			rc.right=rc.left+32;		rc.bottom = rc.top+height2;
-			lp->Blt(m_Graphic,m_nVX,m_nVY+32,&rc);
+			lp->Blt(graphic,m_nVX,m_nVY+32,&rc);
 			// あご
 			rc.left=offset1+offset2;	rc.top = 80;
 			rc.right=rc.left+32;		rc.bottom = rc.top+16;
-			lp->Blt(m_Graphic,m_nVX,m_nVY+height,&rc);
+			lp->Blt(graphic,m_nVX,m_nVY+height,&rc);
 		}ef(height>48) {
 			// ふくろ
 			rc.left=offset1+offset2;	rc.top = 64;
 			rc.right=rc.left+32;		rc.bottom = rc.top+16;
-			lp->Blt(m_Graphic,m_nVX,m_nVY+32,&rc);
+			lp->Blt(graphic,m_nVX,m_nVY+32,&rc);
 			// あご
 			rc.left=offset1+offset2;	rc.top = 80;
 			rc.right=rc.left+32;		rc.bottom = rc.top+16;
-			lp->Blt(m_Graphic,m_nVX,m_nVY+48,&rc);
+			lp->Blt(graphic,m_nVX,m_nVY+48,&rc);
 		}
 	}ef(m_State==EELSEED) {
 		rc.left = 0;	rc.top = 0;
 		rc.right = 32;	rc.bottom = 32;
-		lp->Blt(m_Graphic,m_nVX,m_nVY,&rc);
+		lp->Blt(graphic,m_nVX,m_nVY,&rc);
 	}
 }
 
@@ -169,80 +170,17 @@ void Cf3MapObjectEelPitcher::Seed()
 
 void Cf3MapObjectEelPitcher::Synergy()
 {
-/*	if (!IsValid()) return;
-	m_bBlinking = false;
-	if (m_State==EELLEAF) {
-		Reaction(m_pParent->GetMainChara());
-		for(set<Cf3MapObjectmrframe*>::iterator mf = Cf3MapObjectmrframe::IteratorBegin();
-		mf!=Cf3MapObjectmrframe::IteratorEnd();mf++){
-			if ((*mf)->IsValid()) Reaction((*mf));
-		}
-		if (m_RootY-m_Y>16) {
-			for(set<Cf3MapObjectIce*>::iterator ic = Cf3MapObjectIce::IteratorBegin();
-			ic!=Cf3MapObjectIce::IteratorEnd();ic++){
-				if ((*ic)->IsValid()) {
-					float objX, objY;
-					(*ic)->GetPos(objX,objY);
-					if (IsIn(m_X-16,objX,m_X+16)) {
-						if (IsIn(m_Y,objY,m_Y+40)) {
-							Freeze();
-						}
-					}
-				}
-			}
-		}
-	}
-	for(set<Cf3MapObjectEelPitcher*>::iterator ep = Cf3MapObjectEelPitcher::IteratorBegin();
-	ep!=Cf3MapObjectEelPitcher::IteratorEnd();ep++){
-		if ((*ep)->IsValid()&&(*ep)!=this) {
-			float objX, objY;
-			(*ep)->GetPos(objX,objY);
-			if (m_State==EELLEAF||m_State==EELFROZEN) {
-				if (IsIn(m_X-16,objX,m_X+16)) {
-					if (IsIn(m_Y,objY,m_Y+16)) {
-						if ((*ep)->m_State!=EELLEAF) {
-							// 食べちゃった！！
-							m_Level+=(*ep)->m_Level;
-						}else {
-							// 食べられちゃった！！
-							m_State = EELDEAD;
-						}
-					}
-				}
-			}ef(m_State==EELSEED) {
-				if (IsIn(objX-16,m_X,objX+16)) {
-					if (IsIn(objY,m_Y,objY+16)) {
-						if ((*ep)->m_State!=EELDEAD) {
-							// 食べられちゃった！！
-							m_State = EELDEAD;
-						}else {
-							// 食べちゃった！！
-							m_Level+=(*ep)->m_Level;
-						}
-					}
-				}
-			}
-		}
-	}
-	for(set<Cf3MapObjectGeasprin*>::iterator gs = Cf3MapObjectGeasprin::IteratorBegin();
-	gs!=Cf3MapObjectGeasprin::IteratorEnd();gs++){
-		if ((*gs)->IsValid()) Reaction((*gs));
-	}
-	for(set<Cf3MapObjectNeedle*>::iterator nd = Cf3MapObjectNeedle::IteratorBegin();
-	nd!=Cf3MapObjectNeedle::IteratorEnd();nd++){
-		if ((*nd)->IsValid()) Reaction((*nd));
-	}*/
 	if (!IsValid()) return;
 	m_bBlinking = false;
 	int cx, cy;
 	GetCPos(cx, cy);
 	Cf3MapObjectBase**it;
 	if (m_State==EELLEAF) {
-		for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, OID_FUNYA); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, MOT_FUNYA); (*it)!=NULL; it++){
 			if ((*it)->IsValid()) Reaction((*it));
 		}
 		if (m_RootY-m_Y>16) {
-			for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_ICE); (*it)!=NULL; it++){
+			for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, MOT_ICE); (*it)!=NULL; it++){
 				if ((*it)->IsValid()) {
 					float objX, objY;
 					(*it)->GetPos(objX,objY);
@@ -255,7 +193,7 @@ void Cf3MapObjectEelPitcher::Synergy()
 			}
 		}
 	}
-	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, MOT_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()&&(*it)!=this) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -286,10 +224,10 @@ void Cf3MapObjectEelPitcher::Synergy()
 			}
 		}
 	}
-	for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, OID_GEASPRIN); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(cx-2, cy-2, cx+2, cy+2, MOT_GEASPRIN); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
-	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, OID_NEEDLE); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(cx-1, cy-1, cx+1, cy+1, MOT_NEEDLE); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) Reaction((*it));
 	}
 }
@@ -299,8 +237,8 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 	if (obj==NULL||obj==this) return;
 	float objX, objY;
 	obj->GetPos(objX,objY);
-	switch(obj->GetID()) {
-	case OID_FUNYA:{
+	switch(obj->GetType()) {
+	case MOT_FUNYA:{
 		if (IsIn(m_X-16,objX,m_X+16)) {
 			if (IsIn(m_Y-16,objY,m_Y)) {
 				// 踏まれた！！
@@ -309,8 +247,8 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 		}
 		break;
 				   }
-	case OID_NEEDLE:
-	case OID_GEASPRIN:{
+	case MOT_NEEDLE:
+	case MOT_GEASPRIN:{
 		if (IsIn(m_X-16,objX,m_X+16)) {
 			if (IsIn(m_Y,objY,m_Y+40)) {
 				// 食べちゃった！！
@@ -328,7 +266,7 @@ void Cf3MapObjectEelPitcher::Reaction(Cf3MapObjectBase *obj)
 void Cf3MapObjectEelPitcher::OnMoveAll()
 {
 	for(map<int, Cf3MapObjectEelPitcher*>::iterator it=m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it).second->m_bValid) (*it).second->OnMove();
+		if ((*it).second->IsValid()) (*it).second->OnMove();
 	}
 }
 
@@ -342,13 +280,13 @@ void Cf3MapObjectEelPitcher::SynergyAll()
 void Cf3MapObjectEelPitcher::OnPreDrawAll()
 {
 	for(map<int, Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it).second->m_bValid) (*it).second->OnPreDraw();
+		if ((*it).second->IsValid()) (*it).second->OnPreDraw();
 	}
 }
 
 void Cf3MapObjectEelPitcher::OnDrawAll(CDIB32 *lp)
 {
 	for(map<int, Cf3MapObjectEelPitcher*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it).second->m_bValid) (*it).second->OnDraw(lp);
+		if ((*it).second->IsValid()) (*it).second->OnDraw(lp);
 	}
 }

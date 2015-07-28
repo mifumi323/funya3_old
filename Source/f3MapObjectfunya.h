@@ -84,7 +84,7 @@ public:
 	void OnMove();
 	virtual void OnDraw(CDIB32 *lp);
 	Cf3MapObjectfunya(int nCX, int nCY);
-	virtual ~Cf3MapObjectfunya();
+	virtual ~Cf3MapObjectfunya() {}
 
 };
 

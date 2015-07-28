@@ -13,7 +13,7 @@
 
 class Cf3MapObjectFire : public Cf3MapObjectIceBase  
 {
-protected:
+private:
 	static set<Cf3MapObjectFire*> m_FireList;
 
 	int m_Phase;
@@ -21,7 +21,7 @@ protected:
 	int m_Delay;
 public:
 	void Synergy();
-	bool IsActive();
+	bool IsActive() { return m_Delay==0; }
 	static set<Cf3MapObjectFire*>::iterator IteratorBegin() { return m_FireList.begin(); }
 	static set<Cf3MapObjectFire*>::iterator IteratorEnd(){ return m_FireList.end(); }
 	void OnPreDraw();

@@ -50,7 +50,7 @@ class CAppMainWindow : public CAppBase {	//	アプリケーションクラスから派生
 		opt.classname	= "funya3";
 		opt.size_x		= 320;
 		opt.size_y		= 240;
-		opt.style		= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+		opt.style		= WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 		return 0;
 	}
 };
@@ -157,7 +157,7 @@ void CApp::MainThread(){
 			// BGMの操作
 			if (m_AutoDraw) {
 				if (f3Input.GetKeyPushed(F3KEY_BGMNONE)) ChangeBGM(BGMM_NONE);
-				if (f3Input.GetKeyPushed(F3KEY_BGMDEF)) ChangeBGM(BGMM_DEFAULT);
+				if (f3Input.GetKeyPushed(F3KEY_BGMDEF )) ChangeBGM(BGMM_DEFAULT);
 				if (f3Input.GetKeyPushed(F3KEY_BGMUSER)) ChangeBGM(BGMM_USER);
 			}
 			m_BGM->Update();

@@ -13,7 +13,8 @@ set<Cf3MapObjectItem*> Cf3MapObjectItem::m_ItemList;
 // ç\íz/è¡ñ≈
 //////////////////////////////////////////////////////////////////////
 
-Cf3MapObjectItem::Cf3MapObjectItem()
+Cf3MapObjectItem::Cf3MapObjectItem(f3MapObjectType eType)
+	:Cf3MapObjectBase(eType)
 {
 	m_ItemList.insert(this);
 }

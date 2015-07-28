@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SettingScene.h"
 
+#include "App.h"
 #include "RandomReplay.h"
 
 //////////////////////////////////////////////////////////////////////

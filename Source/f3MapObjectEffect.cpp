@@ -9,8 +9,6 @@
 #include "ResourceManager.h"
 
 set<Cf3MapObjectEffect*> Cf3MapObjectEffect::m_EffectList;
-/*CDIB32 Cf3MapObjectEffect::m_Graphic;
-bool Cf3MapObjectEffect::m_bGraphicInitialize = false;*/
 RECT Cf3MapObjectEffect::m_GraphicRect[4*16] = {
 	{ 0,0, 5,5}, { 0,5, 5,10}, { 0,10, 5,15}, { 0,15, 5,20},
 	{ 5,0,10,5}, { 5,5,10,10}, { 5,10,10,15}, { 5,15,10,20},
@@ -37,13 +35,14 @@ const float PI=3.141592653589793238f;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectEffect::Cf3MapObjectEffect(float x, float y, int EffectType)
+	:Cf3MapObjectBase(MOT_EFFECT)
+	,m_StarNum(0)
+	,m_Star(NULL)
+	,m_nEffectType(EffectType)
 {
 	m_EffectList.insert(this);
-	m_Graphic = ResourceManager.Get(RID_EFFECT);
+//	m_Graphic = ResourceManager.Get(RID_EFFECT);
 	SetPos(x,y);
-	m_StarNum = 0;
-	m_Star = NULL;
-	m_nEffectType = EffectType;
 	if (EffectType==0) {
 		m_StarNum = 12;
 		m_Star = new tagStar[m_StarNum];
@@ -69,13 +68,12 @@ Cf3MapObjectEffect::Cf3MapObjectEffect(float x, float y, int EffectType)
 			m_Star[i].n =35+CApp::random(10);
 		}
 	}else{
-		m_bValid = false;
+		Kill();
 		return;
 	}
 	for (int i=0; i<m_StarNum; i++) {
-		m_Star[i].r =CApp::random(4*16);
+		m_Star[i].r = CApp::random(4*16);
 	}
-	SetID(OID_EFFECT);
 }
 
 Cf3MapObjectEffect::~Cf3MapObjectEffect()
@@ -86,7 +84,7 @@ Cf3MapObjectEffect::~Cf3MapObjectEffect()
 
 void Cf3MapObjectEffect::OnPreDrawAll() {
 	for(set<Cf3MapObjectEffect*>::iterator it = m_EffectList.begin();it!=m_EffectList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 
@@ -98,12 +96,9 @@ void Cf3MapObjectEffect::OnDrawAll(CDIB32 *lp) {
 	ex = sx+320/32; ey = sy+224/32;
 	Saturate(sx,ex,m_pParent->GetWidth()-1);
 	Saturate(sy,ey,m_pParent->GetHeight()-1);
-	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-3, sy-3, ex+3, ey+3, OID_EFFECT); (*it)!=NULL; it++) {
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-3, sy-3, ex+3, ey+3, MOT_EFFECT); (*it)!=NULL; it++) {
 		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
-/*	for(set<Cf3MapObjectEffect*>::iterator it = m_EffectList.begin();it!=m_EffectList.end();it++){
-		if ((*it)->m_bValid) (*it)->OnDraw(lp);
-	}*/
 }
 
 void Cf3MapObjectEffect::OnPreDraw()
@@ -121,10 +116,11 @@ void Cf3MapObjectEffect::OnPreDraw()
 
 void Cf3MapObjectEffect::OnDraw(CDIB32 *lp)
 {
+	CDIB32* graphic = ResourceManager.Get(RID_EFFECT);
 	for (int i=0; i<m_StarNum; i++) {
 		if (m_Star[i].n) {
 			SetViewPos(m_Star[i].x,m_Star[i].y);
-			lp->Blt(m_Graphic,m_nVX,m_nVY,&m_GraphicRect[m_Star[i].r]);
+			lp->Blt(graphic,m_nVX,m_nVY,&m_GraphicRect[m_Star[i].r]);
 		}
 	}
 }

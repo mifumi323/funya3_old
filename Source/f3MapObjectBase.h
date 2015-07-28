@@ -11,6 +11,7 @@
 
 class Cf3Map;
 class CDIB32;
+class Cf3MapObjectBase;
 
 enum f3MapObjectDirection {
 	DIR_FRONT=0,
@@ -18,36 +19,45 @@ enum f3MapObjectDirection {
 	DIR_RIGHT=2,
 };
 
-enum f3MapObjectID {
-	OID_UNKNOWN,
+enum f3MapObjectType {
+//	MOT_UNKNOWN,
 
-	OID_FUNYA,
-	OID_BANANA,
-	OID_NEEDLE,
-	OID_GEASPRIN,
-	OID_EELPITCHER,
-	OID_ICE,
-	OID_ICESOURCE,
-	OID_FIRE,
-	OID_EFFECT,
+	MOT_FUNYA,
+	MOT_BANANA,
+	MOT_NEEDLE,
+	MOT_GEASPRIN,
+	MOT_EELPITCHER,
+	MOT_ICE,
+	MOT_ICESOURCE,
+	MOT_FIRE,
+	MOT_EFFECT,
 
-	OID_COUNT
+//	MOT_COUNT
 };
+
+typedef set<Cf3MapObjectBase*> MapObjectList;
 
 class Cf3MapObjectBase
 {
+//	friend class Cf3MapObjectmrframe;
+//	friend class Cf3MapObjectEffect;
+private:
+	bool			m_bValid;
+	f3MapObjectType	m_eType;
+	int				m_nID;
+
+	static int		m_nNextID;
+	static MapObjectList m_CharaList;
 protected:
+	static void RemoveCharaFromList(Cf3MapObjectBase*lp) { m_CharaList.erase(lp); }
 	void SetViewPos(float offsetx=0, float offsety=0);
+//	void KillSimple() { m_bValid = false; }
 	float			m_X, m_Y;
 	int				m_nVX, m_nVY;
-	float			m_nScrollX, m_nScrollY;	// スクロールにどれほど影響されるか%
-
-	bool			m_bValid;
-	int				m_nType, m_nID;
-	static int		m_nNextID;
+//	float			m_nScrollX, m_nScrollY;	// スクロールにどれほど影響されるか(100%固定なので省略)
+	int				m_nCX, m_nCY;
 
 	static Cf3Map*	m_pParent;
-	static set<Cf3MapObjectBase*> m_CharaList;
 public:
 	static int Count() { return m_CharaList.size();}
 	static void UpdateCPosAll();
@@ -56,30 +66,24 @@ public:
 	virtual void Synergy(){}				// 自発的相互作用(必ず自己完結すること)
 	virtual void GetCPos(int& x, int& y);
 	float GetDistanceSquare(Cf3MapObjectBase& obj);
-	float GetDistance(Cf3MapObjectBase& obj);
-	static	void Garbage();
+//	float GetDistance(Cf3MapObjectBase& obj);
+	static void Garbage();
 	static void SetParent(Cf3Map*lp) { m_pParent = lp; }
-	virtual void SynergyAll() {}
-	virtual	void OnKillAll() {}
-	virtual	void OnPreDrawAll() {}
-	virtual	void OnDrawAll(CDIB32 *lp) {}
-	virtual	void OnMoveAll() {}
 	virtual	void OnPreDraw() {}
-	virtual	void OnDraw(CDIB32 *lp) {}
+	virtual	void OnDraw(CDIB32 *lp) =0;
 	virtual	void OnMove() {}
-	virtual	void Kill();
-	bool	IsValid() { return m_bValid; }
+	void Kill();
+	bool IsValid() { return m_bValid; }
 	void SetPos(float x,float y) { m_X = x; m_Y = y; }
 	void GetPos(float&x,float&y) { x = m_X; y = m_Y; }
 
-	virtual	void	SetID(int nID) { m_nType = nID; }
-	virtual	int		GetID() { return m_nType; }
+	int GetID() { return m_nID; }
+	int GetType() { return m_eType; }
 
-	Cf3MapObjectBase();
+	Cf3MapObjectBase(f3MapObjectType eType);
 	virtual ~Cf3MapObjectBase();
 
 	Cf3MapObjectBase* m_pNext;
-	int m_nCX, m_nCY;
 
 };
 

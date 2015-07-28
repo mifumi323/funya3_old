@@ -16,7 +16,6 @@
 CResultScene::CResultScene()
 {
 	m_nLines = m_nScroll = m_nFocus = 0;
-//	m_NavigationBar = NULL;
 	m_TextNavi.dib = NULL;
 	m_TextTitle = NULL;
 	m_TextResult = NULL;
@@ -24,7 +23,6 @@ CResultScene::CResultScene()
 
 CResultScene::~CResultScene()
 {
-//	DELETE_SAFE(m_NavigationBar);
 	DELETE_SAFE(m_TextNavi.dib);
 	DELETE_SAFE(m_TextTitle);
 	DELETE_SAFE(m_TextResult);
@@ -45,7 +43,6 @@ void CResultScene::OnInit()
 	m_TextResult->GetFont()->SetWeight(FW_BOLD);
 	m_TextResult->GetFont()->SetHeight(24);
 	// ナビゲーションバー
-//	m_NavigationBar = new Cf3NavigationBar;
 	f3Navi.Clear();
 	m_TextNavi.Set(new CTextDIB32);
 	f3Navi.Add(&m_TextNavi);

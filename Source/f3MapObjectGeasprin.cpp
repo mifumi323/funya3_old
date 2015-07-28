@@ -15,7 +15,6 @@
 #include "ResourceManager.h"
 
 map<int, Cf3MapObjectGeasprin*> Cf3MapObjectGeasprin::m_EnemyList;
-//set<Cf3MapObjectGeasprin*> Cf3MapObjectGeasprin::m_EnemyList;
 
 const WalkDelay = 10;
 
@@ -24,11 +23,11 @@ const WalkDelay = 10;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectGeasprin::Cf3MapObjectGeasprin(int nCX, int nCY, f3MapObjectDirection direction)
+	:Cf3MapObjectBase(MOT_GEASPRIN)
 {
-	m_EnemyList.insert(pair<int, Cf3MapObjectGeasprin*>(m_nID, this));
+	m_EnemyList.insert(pair<int, Cf3MapObjectGeasprin*>(GetID(), this));
 	m_Graphic = ResourceManager.Get(RID_GEASPRIN);
 	SetPos(nCX*32+16,nCY*32+16);
-	SetID(OID_GEASPRIN);
 	m_Direction = direction;
 	m_Spring[DIR_FRONT] = m_Spring[DIR_LEFT] = m_Spring[DIR_RIGHT] = m_Spring2[DIR_FRONT] = m_Spring2[DIR_LEFT] = m_Spring2[DIR_RIGHT] = 0;
 	Stop();
@@ -36,12 +35,12 @@ Cf3MapObjectGeasprin::Cf3MapObjectGeasprin(int nCX, int nCY, f3MapObjectDirectio
 
 Cf3MapObjectGeasprin::~Cf3MapObjectGeasprin()
 {
-	m_EnemyList.erase(m_nID);
+	m_EnemyList.erase(GetID());
 }
 
 void Cf3MapObjectGeasprin::OnDraw(CDIB32 *lp)
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	SetViewPos(-16,-16);
 	// バネ
 	if (m_Spring2[DIR_FRONT]) {
@@ -83,7 +82,7 @@ void Cf3MapObjectGeasprin::OnDraw(CDIB32 *lp)
 
 void Cf3MapObjectGeasprin::OnMove()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (m_Delay) m_Delay--;
 	if (m_State==WALKING) {
 		if (m_Direction==DIR_LEFT&&m_pParent->GetHit(floor((m_X-17)/32),floor(m_Y/32),HIT_RIGHT)){
@@ -204,7 +203,7 @@ void Cf3MapObjectGeasprin::Synergy()
 	if (!IsValid()) return;
 	Cf3MapObjectBase**it;
 	// ウナギカズラ
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -220,11 +219,11 @@ void Cf3MapObjectGeasprin::Synergy()
 	}
 	if (!IsFrozen()) {
 		// ふにゃ
-		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_FUNYA); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_FUNYA); (*it)!=NULL; it++){
 			if ((*it)->IsValid()) Reaction((*it));
 		}
 		// ギヤバネ
-		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_GEASPRIN); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_GEASPRIN); (*it)!=NULL; it++){
 			if ((*it)!=this&&(*it)->IsValid()) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);
@@ -271,7 +270,7 @@ void Cf3MapObjectGeasprin::Synergy()
 			}
 		}
 		// 氷
-		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_ICE); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_ICE); (*it)!=NULL; it++){
 			if ((*it)->IsValid()) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);
@@ -289,8 +288,8 @@ void Cf3MapObjectGeasprin::Reaction(Cf3MapObjectBase *obj)
 	if (obj==NULL) return;
 	float objX, objY;
 	obj->GetPos(objX,objY);
-	switch(obj->GetID()) {
-	case OID_FUNYA:{
+	switch(obj->GetType()) {
+	case MOT_FUNYA:{
 		if (IsIn(m_X-16,objX,m_X+16)) {
 			if (IsIn(m_Y-32,objY,m_Y)) {
 				// 踏まれた！
@@ -330,7 +329,7 @@ void Cf3MapObjectGeasprin::Jump()
 void Cf3MapObjectGeasprin::OnMoveAll()
 {
 	for(map<int, Cf3MapObjectGeasprin*>::iterator it=m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it).second->m_bValid) (*it).second->OnMove();
+		if ((*it).second->IsValid()) (*it).second->OnMove();
 	}
 }
 
@@ -344,7 +343,7 @@ void Cf3MapObjectGeasprin::SynergyAll()
 void Cf3MapObjectGeasprin::OnPreDrawAll()
 {
 	for(map<int, Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){
-		if ((*it).second->m_bValid) (*it).second->OnPreDraw();
+		if ((*it).second->IsValid()) (*it).second->OnPreDraw();
 	}
 }
 
@@ -357,7 +356,7 @@ void Cf3MapObjectGeasprin::OnDrawAll(CDIB32 *lp)
 	ex = sx+320/32; ey = sy+224/32;
 	Saturate(sx,ex,m_pParent->GetWidth()-1);
 	Saturate(sy,ey,m_pParent->GetHeight()-1);
-	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, OID_GEASPRIN); (*it)!=NULL; it++) {
+	for (Cf3MapObjectBase**it=m_pParent->GetMapObjects(sx-1, sy-1, ex+1, ey+1, MOT_GEASPRIN); (*it)!=NULL; it++) {
 		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
 /*	for(set<Cf3MapObjectGeasprin*>::iterator it = m_EnemyList.begin();it!=m_EnemyList.end();it++){

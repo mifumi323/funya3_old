@@ -21,14 +21,14 @@ public:
 	virtual bool GetKeyPressed	(int key)=0;
 };
 
-extern class Cf3GameInpuKey : public Cf3GameInput
+extern class Cf3GameInputKey : public Cf3GameInput
 {
 public:
 	bool GetKeyPushed	(int key) { return f3Input.GetKeyPushed(key); }
 	bool GetKeyPressed	(int key) { return f3Input.GetKeyPressed(key); }
 } KeyInput;
 
-extern class Cf3GameInpuReplay : public Cf3GameInput
+extern class Cf3GameInputReplay : public Cf3GameInput
 {
 public:
 	BYTE pushed, pressed;
@@ -47,7 +47,7 @@ public:
 	virtual void Die() {}
 	virtual bool IsDied();
 	virtual void GetViewPos(int &vx, int &vy);
-	Cf3MapObjectMain() {}
+	Cf3MapObjectMain(f3MapObjectType eType) : Cf3MapObjectBase(eType) {}
 	virtual ~Cf3MapObjectMain() {}
 
 };

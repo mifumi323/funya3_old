@@ -21,29 +21,27 @@ const float ROTATEACCEL = 0.5f;
 const float ROTATEFRICTION = 0.01f;
 
 Cf3MapObjectfff::Cf3MapObjectfff(int nCX, int nCY)
+	:Cf3MapObjectMain(MOT_FUNYA)
+	,m_DX   (0.0f), m_DY   (0.0f)
+	,m_OldDX(0.0f), m_OldDY(0.0f)
+	,m_Angle(0.0f), m_DAngle(0.0f)
+	,m_nPower(0)
+	,m_Power(0.0f)
+	,m_PowerX(0.0f), m_PowerY(0.0f)
+	,m_VOffsetX  (0), m_VOffsetY  (0)
+	,m_VOffsetToX(0), m_VOffsetToY(0)
+	,m_PoseCounter2(0)
+	,m_State(NORMAL)
 {
-	m_Graphic = ResourceManager.Get(RID_MAIN);
-	m_Graphic2 = ResourceManager.Get(RID_MAINICY);
-	SetID(OID_FUNYA);
-	m_DX = m_DY = m_OldDX = m_OldDY = 0;
-	m_Angle = m_DAngle = 0;
-	m_nPower = 0;
-	m_Power = m_PowerX = m_PowerY = 0.0f;
+//	m_Graphic = ResourceManager.Get(RID_MAIN);
+//	m_Graphic2 = ResourceManager.Get(RID_MAINICY);
 	SetPos(nCX*32+16,nCY*32+18);
 	m_OldX = m_X; m_OldY = m_Y;
-	m_VOffsetX = m_VOffsetY = m_VOffsetToX = m_VOffsetToY = 0;
-	m_PoseCounter2=0;
-	m_State=NORMAL;
-}
-
-Cf3MapObjectfff::~Cf3MapObjectfff()
-{
-
 }
 
 void Cf3MapObjectfff::OnDraw(CDIB32 *lp)
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (m_pParent->ItemCompleted()) Smile();
 	int CX=0, CY=0;
 	SetViewPos(-15,-15);
@@ -65,24 +63,21 @@ void Cf3MapObjectfff::OnDraw(CDIB32 *lp)
 	case SMILE:		CX=18; break;
 	}
 	RECT rc = {CX*32+1, CY*32, CX*32+31, CY*32+30,};
-	lp->RotateBlt(m_nPower==0?m_Graphic:m_Graphic2,&rc,m_nVX,m_nVY,m_Angle,65536,4);
+	CDIB32* graphic = ResourceManager.Get(RID_MAIN);
+	CDIB32* graphic2 = ResourceManager.Get(RID_MAINICY);
+	lp->RotateBlt(m_nPower==0?graphic:graphic2,&rc,m_nVX,m_nVY,m_Angle,65536,4);
 	if (m_Power<-1.0f/4096.0f) {
 		rc.left=(m_PoseCounter2<20?0:64)+(floor(m_X/32)<m_pParent->GetWidth()-1?0:128);
 		rc.top=96;
 		rc.right=rc.left+64;
 		rc.bottom=rc.top+32;
-		lp->BltNatural(m_Graphic,m_nVX-16,m_nVY,&rc);
+		lp->BltNatural(graphic,m_nVX-16,m_nVY,&rc);
 	}
-}
-
-void Cf3MapObjectfff::Smile()
-{
-	m_State=SMILE;
 }
 
 void Cf3MapObjectfff::OnMove()
 {
-	if (!m_bValid) return;
+	if (!IsValid()) return;
 	if (!m_pParent->IsPlayable()) return;
 	float Wind = m_pParent->GetWind(floor(m_X/32),floor(m_Y/32));
 	if (m_pParent->ItemCompleted()) Smile();
@@ -156,7 +151,7 @@ void Cf3MapObjectfff::OnMove()
 	}
 	// ‘¬“x–O˜a(‚ß‚èž‚Ý–hŽ~)
 	if (m_DX*m_DX+m_DY*m_DY>13*13) {
-		float r = 13/sqrt(m_DX*m_DX+m_DY*m_DY);
+		float r = 13.0f/sqrt(m_DX*m_DX+m_DY*m_DY);
 		m_DX *= r; m_DY *= r;
 	}
 	// ŽÀÛ‚ÌˆÚ“®+“–‚½‚è”»’è
@@ -166,11 +161,6 @@ void Cf3MapObjectfff::OnMove()
 	HitCheck();
 	m_Y += m_DY;
 	HitCheck();
-}
-
-bool Cf3MapObjectfff::IsDied()
-{
-	return m_State==DEAD;
 }
 
 void Cf3MapObjectfff::HitCheck()
@@ -230,7 +220,7 @@ void Cf3MapObjectfff::Synergy()
 	m_Power = m_PowerX = m_PowerY = 0.0f;
 	Cf3MapObjectBase**it;
 	// ƒMƒ„ƒoƒl
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_GEASPRIN); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_GEASPRIN); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -272,7 +262,7 @@ void Cf3MapObjectfff::Synergy()
 		}
 	}
 	// ‚Æ‚°‚Æ‚°
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_NEEDLE); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_NEEDLE); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -283,7 +273,7 @@ void Cf3MapObjectfff::Synergy()
 		}
 	}
 	// ƒEƒiƒMƒJƒYƒ‰
-	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
+	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()&&((Cf3MapObjectEelPitcher*)(*it))->IsLeaf()) {
 			float objX, objY;
 			(*it)->GetPos(objX,objY);
@@ -299,7 +289,7 @@ void Cf3MapObjectfff::Synergy()
 	}
 	if (m_State!=FROZEN) {
 		// •X
-		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_ICE); (*it)!=NULL; it++){
+		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, MOT_ICE); (*it)!=NULL; it++){
 			if ((*it)->IsValid()&&((Cf3MapObjectIce*)(*it))->GetSize()>10) {
 				float objX, objY;
 				(*it)->GetPos(objX,objY);

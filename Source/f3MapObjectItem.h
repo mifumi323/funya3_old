@@ -20,7 +20,7 @@ public:
 	static void OnPreDrawAll();
 	static void OnDrawAll(CDIB32 *lp);
 	static void OnMoveAll();
-	Cf3MapObjectItem();
+	Cf3MapObjectItem(f3MapObjectType eType);
 	virtual ~Cf3MapObjectItem();
 
 	static set<Cf3MapObjectItem*>	m_ItemList;

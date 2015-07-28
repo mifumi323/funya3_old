@@ -14,12 +14,9 @@
 class Cf3MapObjectIceBase : public Cf3MapObjectBase  
 {
 protected:
-/*	static CDIB32					m_Graphic;
-	static bool						m_bGraphicInitialize;
-	CDIBResource m_Graphic;*/
 	CDIB32* m_Graphic;
 public:
-	Cf3MapObjectIceBase();
+	Cf3MapObjectIceBase(f3MapObjectType eType);
 	virtual ~Cf3MapObjectIceBase();
 
 };

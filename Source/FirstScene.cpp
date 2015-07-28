@@ -33,7 +33,6 @@ enum {
 CFirstScene::CFirstScene()
 {
 	m_Select = NULL;
-//	m_NavigationBar = NULL;
 	m_TextTitle = NULL;
 	m_TextNavi.dib = NULL;
 	m_TextDemo.dib = NULL;
@@ -42,7 +41,6 @@ CFirstScene::CFirstScene()
 CFirstScene::~CFirstScene()
 {
 	DELETE_SAFE(m_Select);
-//	DELETE_SAFE(m_NavigationBar);
 	DELETE_SAFE(m_TextTitle);
 	DELETE_SAFE(m_TextNavi.dib);
 	DELETE_SAFE(m_TextDemo.dib);
@@ -61,7 +59,6 @@ void CFirstScene::OnInit()
 	m_TextTitle->GetFont()->SetText("ふにゃさん");
 	m_TextTitle->UpdateText();
 	// ナビゲーション
-//	m_NavigationBar = new Cf3NavigationBar;
 	f3Navi.Clear();
 	m_TextNavi.Set(new CTextDIB32);
 	{
@@ -77,15 +74,11 @@ void CFirstScene::OnInit()
 	m_TextNavi.Update();
 	f3Navi.Add(&m_TextNavi);
 	m_TextDemo.Set(new CTextDIB32);
-//	m_TextDemo.text->GetFont()->SetSize(16);
-//	m_TextDemo.text->GetFont()->SetColor(0x000020);
-//	m_TextDemo.text->GetFont()->SetBackColor(0x303030);
 	m_TextDemo.text->GetFont()->SetText("");
 	m_TextDemo.Update();
 	f3Navi.Add(&m_TextDemo);
 	// リプレイ関係
 	f3Replay.Enter();
-//	FindAllReplayFile();
 	// その他
 	m_Icon = ResourceManager.Get(RID_MAIN);
 	theApp->GetBGM()->Play(BGMN_TITLE);
@@ -110,10 +103,6 @@ void CFirstScene::OnDraw(CDIB32 *lp)
 			// 設定
 			f3Input.Input();
 			JumpScene(SETTING_SCENE);
-/*			theApp->GetDraw()->SetDisplay(false, 320, 240);
-			Cf3ConfigWindow().Open();
-			theApp->GetDraw()->SetDisplay(theSetting->m_FullScreen!=0, 320, 240);
-			f3Input.Input();*/
 		}ef(m_Select->GetSelected()==FSM_EXIT) {
 			// 終了
 			f3Replay.Leave();
@@ -149,7 +138,7 @@ void CFirstScene::SetMenu(int no)
 	if (m_nMenu==0) {
 		m_Select->Add("ゲーム開始", FSM_GAMESTART);
 		m_Select->Add("操作説明", FSM_EXPLAIN);
-		m_Select->Add("設定", FSM_CONFIG);
+		//m_Select->Add("設定", FSM_CONFIG);
 		m_Select->Add("終了", FSM_EXIT);
 	}ef(m_nMenu==1) {
 		m_Select->Add("プレイ記録", FSM_RESULT);

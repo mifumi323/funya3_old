@@ -15,6 +15,7 @@ set<Cf3MapObjectWind*> Cf3MapObjectWind::m_WindList;
 //////////////////////////////////////////////////////////////////////
 
 Cf3MapObjectWind::Cf3MapObjectWind(int x, int y, int w, float s)
+	:Cf3MapObjectBase(MOT_EFFECT)
 {
 	m_WindList.insert(this);
 	if (!m_bGraphicInitialize) {
@@ -47,16 +48,14 @@ Cf3MapObjectWind::~Cf3MapObjectWind()
 void Cf3MapObjectWind::OnDrawAll(CDIB32 *lp)
 {
 	for(set<Cf3MapObjectWind*>::iterator it = m_WindList.begin();it!=m_WindList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnDraw(lp);
+		if ((*it)->IsValid()) (*it)->OnDraw(lp);
 	}
 }
 
 void Cf3MapObjectWind::OnPreDrawAll()
 {
 	for(set<Cf3MapObjectWind*>::iterator it = m_WindList.begin();it!=m_WindList.end();it++){
-		if ((*it)->m_bValid)
-			(*it)->OnPreDraw();
+		if ((*it)->IsValid()) (*it)->OnPreDraw();
 	}
 }
 
