@@ -1,0 +1,5 @@
+LIBRARY f3sEditDLL.dll
+
+EXPORTS
+  GetStageData
+  CompileCompress
