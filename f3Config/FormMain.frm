@@ -50,7 +50,7 @@ Begin VB.Form FormMain
       Index           =   10
       Left            =   0
       TabIndex        =   1
-      Top             =   960
+      Top             =   360
       Width           =   2055
       Begin VB.CheckBox chkBGMLoop 
          Caption         =   "ループ"
@@ -98,9 +98,9 @@ Begin VB.Form FormMain
       Caption         =   "リプレイデータ"
       Height          =   2895
       Index           =   40
-      Left            =   2880
+      Left            =   4920
       TabIndex        =   29
-      Top             =   1440
+      Top             =   3360
       Width           =   3735
       Begin VB.FileListBox filReplay 
          Height          =   270
@@ -196,29 +196,39 @@ Begin VB.Form FormMain
    End
    Begin VB.Frame fraCategory 
       Caption         =   "全般"
-      Height          =   3495
+      Height          =   3855
       Index           =   0
       Left            =   1920
       TabIndex        =   2
       Top             =   0
       Width           =   3015
+      Begin VB.ComboBox cmbTime 
+         Height          =   300
+         ItemData        =   "FormMain.frx":0442
+         Left            =   120
+         List            =   "FormMain.frx":0452
+         Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
+         TabIndex        =   42
+         Top             =   1680
+         Width           =   1455
+      End
       Begin VB.CheckBox chkHyper 
          Caption         =   "氷の息無制限"
          Height          =   255
          Left            =   120
          TabIndex        =   24
-         Top             =   3120
+         Top             =   3480
          Visible         =   0   'False
          Width           =   1455
       End
       Begin VB.ComboBox cmbEffect 
          Height          =   300
-         ItemData        =   "FormMain.frx":0442
+         ItemData        =   "FormMain.frx":04A6
          Left            =   120
-         List            =   "FormMain.frx":045E
+         List            =   "FormMain.frx":04C2
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   23
-         Top             =   2760
+         Top             =   3120
          Visible         =   0   'False
          Width           =   1455
       End
@@ -226,7 +236,7 @@ Begin VB.Form FormMain
          Height          =   615
          Index           =   71
          Left            =   2280
-         Picture         =   "FormMain.frx":050A
+         Picture         =   "FormMain.frx":056E
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   22
          ToolTipText     =   "ミスターフレーム"
@@ -238,7 +248,7 @@ Begin VB.Form FormMain
          Height          =   615
          Index           =   45
          Left            =   1560
-         Picture         =   "FormMain.frx":05FA
+         Picture         =   "FormMain.frx":065E
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   21
          ToolTipText     =   "あんこ"
@@ -250,7 +260,7 @@ Begin VB.Form FormMain
          Height          =   615
          Index           =   1
          Left            =   840
-         Picture         =   "FormMain.frx":06D5
+         Picture         =   "FormMain.frx":0739
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   20
          ToolTipText     =   "サングラス"
@@ -261,7 +271,7 @@ Begin VB.Form FormMain
          Height          =   615
          Index           =   0
          Left            =   120
-         Picture         =   "FormMain.frx":07B6
+         Picture         =   "FormMain.frx":081A
          Style           =   1  'ｸﾞﾗﾌｨｯｸｽ
          TabIndex        =   19
          ToolTipText     =   "ふにゃ"
@@ -271,12 +281,12 @@ Begin VB.Form FormMain
       End
       Begin VB.ComboBox cmbGravity 
          Height          =   300
-         ItemData        =   "FormMain.frx":0888
+         ItemData        =   "FormMain.frx":08EC
          Left            =   120
-         List            =   "FormMain.frx":0895
+         List            =   "FormMain.frx":08F9
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   18
-         Top             =   2400
+         Top             =   2760
          Visible         =   0   'False
          Width           =   1455
       End
@@ -285,18 +295,18 @@ Begin VB.Form FormMain
          Height          =   255
          Left            =   120
          TabIndex        =   17
-         Top             =   2040
+         Top             =   2400
          Visible         =   0   'False
          Width           =   1455
       End
       Begin VB.ComboBox cmbFPS 
          Height          =   300
-         ItemData        =   "FormMain.frx":08BD
+         ItemData        =   "FormMain.frx":0921
          Left            =   120
-         List            =   "FormMain.frx":08DE
+         List            =   "FormMain.frx":0942
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   16
-         Top             =   1680
+         Top             =   2040
          Visible         =   0   'False
          Width           =   1455
       End
@@ -310,9 +320,9 @@ Begin VB.Form FormMain
       End
       Begin VB.ComboBox cmbBGMMode 
          Height          =   300
-         ItemData        =   "FormMain.frx":091C
+         ItemData        =   "FormMain.frx":0980
          Left            =   120
-         List            =   "FormMain.frx":0929
+         List            =   "FormMain.frx":098D
          Style           =   2  'ﾄﾞﾛｯﾌﾟﾀﾞｳﾝ ﾘｽﾄ
          TabIndex        =   7
          Top             =   240
@@ -321,17 +331,25 @@ Begin VB.Form FormMain
    End
    Begin VB.Frame fraButton 
       BorderStyle     =   0  'なし
-      Height          =   1335
+      Height          =   1815
       Left            =   120
       TabIndex        =   25
-      Top             =   3000
+      Top             =   2520
       Width           =   1695
+      Begin VB.CommandButton cmdSave 
+         Caption         =   "設定保存"
+         Height          =   375
+         Left            =   0
+         TabIndex        =   41
+         Top             =   480
+         Width           =   1695
+      End
       Begin VB.CommandButton cmdOK 
          Caption         =   "OK"
          Height          =   375
          Left            =   0
          TabIndex        =   28
-         Top             =   480
+         Top             =   960
          Width           =   1695
       End
       Begin VB.CommandButton cmdCancel 
@@ -339,7 +357,7 @@ Begin VB.Form FormMain
          Height          =   375
          Left            =   0
          TabIndex        =   27
-         Top             =   960
+         Top             =   1440
          Width           =   1695
       End
       Begin VB.CommandButton cmdPlay 
@@ -355,9 +373,9 @@ Begin VB.Form FormMain
       Caption         =   "プレイ記録"
       Height          =   615
       Index           =   100
-      Left            =   0
+      Left            =   5040
       TabIndex        =   14
-      Top             =   360
+      Top             =   0
       Width           =   1695
       Begin VB.ListBox lstResult 
          Height          =   240
@@ -368,7 +386,7 @@ Begin VB.Form FormMain
       End
    End
    Begin VB.ListBox lstCategory 
-      Height          =   2760
+      Height          =   2220
       Left            =   120
       TabIndex        =   0
       Top             =   120
@@ -503,6 +521,11 @@ Private Sub cmdReplay_Click()
     Shell "funya3.exe REPLAY """ & Replace(filReplay.List(lstReplay.ListIndex), ".f3r", "") & """", vbNormalFocus
 End Sub
 
+Private Sub cmdSave_Click()
+    BGM.SaveFile
+    f3SaveSetting
+End Sub
+
 Private Sub Form_Load()
     Dim N
     Dim I As Long
@@ -585,6 +608,7 @@ Private Sub Form_Resize()
         '全般
         cmbBGMMode.Width = ItemWidth
         chkFullScreen.Width = ItemWidth
+        cmbTime.Width = ItemWidth
         cmbFPS.Width = ItemWidth
         chkESP.Width = ItemWidth
         cmbGravity.Width = ItemWidth
@@ -685,6 +709,7 @@ Public Sub f3LoadSetting()
     N = FreeFile
     cmbBGMMode.ListIndex = 0
     chkFullScreen.Value = 0
+    cmbTime.ListIndex = 0
     cmbGravity.ListIndex = 0
     cmbEffect.ListIndex = 0
     chkHyper.Value = 0
@@ -711,6 +736,10 @@ Public Sub f3LoadSetting()
                 ElseIf l.IsMatch("CHARACTER") Then
                     l.GetNum I
                     optChara(I).Value = True
+                
+                ElseIf l.IsMatch("VIEWTIME") Then
+                    l.GetNum I
+                    cmbTime.ListIndex = I And 3
                 
                 ElseIf l.IsMatch("RECORDCLEAR") Then
                     l.GetNum I
@@ -851,6 +880,7 @@ Public Sub f3SaveSetting()
         Print #N, "BGM" & " " & cmbBGMMode.ListIndex
         Print #N, "FULLSCREEN" & " " & chkFullScreen.Value
         Print #N, "CHARACTER" & " " & TrueOption(optChara)
+        Print #N, "VIEWTIME" & " " & cmbTime.ListIndex
         Print #N, "RECORDCLEAR" & " " & hscRecordClear.Value
         Print #N, "RECORDMISS" & " " & hscRecordMiss.Value
         Print #N, "RECORDNUMBER" & " " & hscRecordNumber.Value
@@ -942,14 +972,26 @@ End Function
 Private Sub RefreshReplay()
     Dim I As Integer
     Dim fn As String
+    Dim dll As Boolean
+    dll = IsDLLEnable()
     filReplay.Refresh
     If filReplay.ListCount = lstReplay.ListCount Then Exit Sub
     lstReplay.Clear
     For I = 0 To filReplay.ListCount - 1
         fn = filReplay.List(I)
-        lstReplay.AddItem Left(fn, Len(fn) - 4) & " - " & GetStageName(fn)
+        If dll Then
+            lstReplay.AddItem Left(fn, Len(fn) - 4) & " - " & GetStageName(fn)
+        Else
+            lstReplay.AddItem Left(fn, Len(fn) - 4)
+        End If
     Next
 End Sub
+
+Private Function IsDLLEnable()
+    On Error Resume Next
+    GetCompressedStageData ByVal 0, 0, 0, 0, 0
+    IsDLLEnable = Err.Number = 0
+End Function
 
 Private Function GetStageName(fn As String)
     Dim Size1 As Long, Size2 As Long
@@ -973,7 +1015,7 @@ Private Function GetStageName(fn As String)
             Else
                 stg = 0
             End If
-            GetStageName = GetDataString(s, GetChunkType("TL", stg), Size1, Size2)
+            GetStageName = (stg + 1) & "面 " & GetDataString(s, GetChunkType("TL", stg), Size1, Size2)
         End If
     Close N
 End Function

@@ -34,6 +34,7 @@ public:
 	int		m_BGMMode;
 	int		m_FullScreen;
 	int		m_Character;
+	int		m_ViewTime;
 	int		m_FPS;
 	int		m_ESP;
 	int		m_Gravity;

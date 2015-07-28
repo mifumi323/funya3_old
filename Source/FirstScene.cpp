@@ -55,9 +55,9 @@ void CFirstScene::OnInit()
 	m_TextTitle->UpdateText();
 	// ナビゲーション
 	m_TextNavi.Set(new CTextDIB32);
-	m_TextNavi.text->GetFont()->SetSize(16);
-	m_TextNavi.text->GetFont()->SetColor(0x000020);
-	m_TextNavi.text->GetFont()->SetBackColor(0x303030);
+//	m_TextNavi.text->GetFont()->SetSize(16);
+//	m_TextNavi.text->GetFont()->SetColor(0x000020);
+//	m_TextNavi.text->GetFont()->SetBackColor(0x303030);
 	{
 		string navi="　　TokioSoft　ふにゃさん";
 		char strbuf[256];
@@ -75,9 +75,9 @@ void CFirstScene::OnInit()
 	m_TextNavi.Update();
 	m_NavigationBar->Add(&m_TextNavi);
 	m_TextDemo.Set(new CTextDIB32);
-	m_TextDemo.text->GetFont()->SetSize(16);
-	m_TextDemo.text->GetFont()->SetColor(0x000020);
-	m_TextDemo.text->GetFont()->SetBackColor(0x303030);
+//	m_TextDemo.text->GetFont()->SetSize(16);
+//	m_TextDemo.text->GetFont()->SetColor(0x000020);
+//	m_TextDemo.text->GetFont()->SetBackColor(0x303030);
 	m_TextDemo.text->GetFont()->SetText("");
 	m_TextDemo.Update();
 	m_NavigationBar->Add(&m_TextDemo);

@@ -22,8 +22,19 @@ public:
 class TTextNavi : public TNavi {
 public:
 	TTextNavi() { text=NULL; }
-	void Update() { text->UpdateText(); int w,h; text->GetSize(w,h); rect.right=w; rect.bottom=h; }
-	void Set(CTextDIB32* text) { dib=this->text=text; }
+	void Update() {
+		if (text==NULL) return;
+		text->UpdateText();
+		int w,h;
+		text->GetSize(w,h);
+		rect.right=w; rect.bottom=h;
+	}
+	void Set(CTextDIB32* text) {
+		if ((dib=this->text=text)==NULL) return;
+		this->text->GetFont()->SetSize(16);
+		this->text->GetFont()->SetColor(0x000020);
+		this->text->GetFont()->SetBackColor(0x303030);
+	}
 	CTextDIB32* text;
 };
 

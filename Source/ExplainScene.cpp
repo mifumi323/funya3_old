@@ -52,9 +52,9 @@ void CExplainScene::OnInit()
 	// ナビゲーション
 	m_NavigationBar = new Cf3NavigationBar;
 	CTextDIB32* text = new CTextDIB32;
-	text->GetFont()->SetSize(16);
-	text->GetFont()->SetColor(0x000020);
-	text->GetFont()->SetBackColor(0x303030);
+//	text->GetFont()->SetSize(16);
+//	text->GetFont()->SetColor(0x000020);
+//	text->GetFont()->SetBackColor(0x303030);
 	m_Text.Set(text);
 	m_NavigationBar->Add(&m_Text);
 	// 説明用の255*255のマップの入ったファイルイメージを生成する

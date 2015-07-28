@@ -18,15 +18,18 @@ class Cf3Map;
 class CReplayScene : public CSceneBase  
 {
 protected:
+	void UpdateTime();
 	Cf3NavigationBar	*m_NavigationBar;
 	TNavi				m_BananaGraphic;
 	TTextNavi			m_BananaCount;
 	TTextNavi			m_StageTitle;
+	TNavi				m_TimeGraphic;
+	TTextNavi			m_TimeCount;
 	CTextDIB32			*m_Message;
 
 	Cf3Replay			*m_pPlayer;
 	Cf3Map				*m_pMap;
-	int					m_Phase;
+	int					m_Phase, m_nTime;
 public:
 	void OnDraw(CDIB32 *lp);
 	void OnInit();

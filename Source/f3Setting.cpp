@@ -11,6 +11,7 @@
 static char SS_BGM[] =			"BGM";
 static char SS_FULLSCREEN[] =	"FULLSCREEN";
 static char SS_CHARACTER[] =	"CHARACTER";
+static char SS_VIEWTIME[] =		"VIEWTIME";
 static char SS_FPS[] =			"FPS";
 static char SS_ESP[] =			"ESP";
 static char SS_GRAVITY[] =		"GRAVITY";
@@ -62,6 +63,7 @@ Cf3Setting::Cf3Setting()
 		{ SS_BGM,			&m_BGMMode,				false},
 		{ SS_FULLSCREEN,	&m_FullScreen,			false},
 		{ SS_CHARACTER,		&m_Character,			false},
+		{ SS_VIEWTIME,		&m_ViewTime,			false},
 		{ SS_FPS,			&m_FPS,					false},
 		{ SS_ESP,			&m_ESP,					false},
 		{ SS_GRAVITY,		&m_Gravity,				false},

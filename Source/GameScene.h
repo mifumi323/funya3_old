@@ -37,11 +37,14 @@ private:
 	TTextNavi		m_StageTitle;
 	TNavi			m_RestGraphic;
 	TTextNavi		m_RestCount;
+	TNavi				m_TimeGraphic;
+	TTextNavi			m_TimeCount;
 
 	CTextDIB32		*m_Message;
 	int				m_MessageCount;
 
 	Cf3Replay		*m_pRecorder;
+	int				m_nTime;
 
 	enum f3GameSceneState {
 		GSS_PLAYING,
@@ -62,6 +65,7 @@ public:
 	static int	m_nStage;
 
 protected:
+	void UpdateTime();
 	void Unpause();
 	void Pause();
 	void UpdateRest();

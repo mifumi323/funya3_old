@@ -56,6 +56,7 @@ protected:
 
 public:
 	// ‹¤’Ê
+	int GetSize() { return m_nSize; }
 	string GetFileName() { return m_FileName; }
 	bool Finished() { return m_nProgress>=m_nSize; }
 	void Reset();

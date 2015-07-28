@@ -34,6 +34,7 @@ CGameScene::~CGameScene()
 	delete m_BananaCount.text;
 	delete m_StageTitle.text;
 	delete m_RestCount.text;
+	if (theSetting->m_ViewTime&3) delete m_TimeCount.text;
 	delete m_Message;
 	delete m_Select;
 	delete m_Temparature;
@@ -57,6 +58,8 @@ void CGameScene::OnInit()
 	m_Map = NULL;
 	// ナビゲーション
 	m_NavigationBar = new Cf3NavigationBar;
+	m_StageTitle.Set(new CTextDIB32);
+	m_NavigationBar->Add(&m_StageTitle);
 	m_BananaGraphic.dib = ResourceManager.Get(RID_MAIN);
 	m_BananaGraphic.offset=0;
 	m_BananaGraphic.rect.left=416;
@@ -64,17 +67,9 @@ void CGameScene::OnInit()
 	m_BananaGraphic.rect.right=432;
 	m_BananaGraphic.rect.bottom=112;
 	m_NavigationBar->Add(&m_BananaGraphic);
+	m_BananaCount.offset = 0;
 	m_BananaCount.Set(new CTextDIB32);
-	m_BananaCount.text->GetFont()->SetSize(16);
-	m_BananaCount.text->GetFont()->SetColor(0x000020);
-	m_BananaCount.text->GetFont()->SetBackColor(0x303030);
 	m_NavigationBar->Add(&m_BananaCount);
-	m_StageTitle.Set(new CTextDIB32);
-	m_StageTitle.text->GetFont()->SetSize(16);
-	m_StageTitle.text->GetFont()->SetColor(0x000020);
-	m_StageTitle.text->GetFont()->SetBackColor(0x303030);
-	m_NavigationBar->Add(&m_StageTitle);
-	m_RestGraphic.dib = new CDIB32;
 	m_RestGraphic.dib = ResourceManager.Get(RID_MAIN);
 	m_RestGraphic.offset=0;
 	m_RestGraphic.rect.left=352;
@@ -83,11 +78,19 @@ void CGameScene::OnInit()
 	m_RestGraphic.rect.bottom=112;
 	m_NavigationBar->Add(&m_RestGraphic);
 	m_RestCount.Set(new CTextDIB32);
-	m_RestCount.text->GetFont()->SetSize(16);
-	m_RestCount.text->GetFont()->SetColor(0x000020);
-	m_RestCount.text->GetFont()->SetBackColor(0x303030);
-	m_RestCount.offset = 0;
 	m_NavigationBar->Add(&m_RestCount);
+	if (theSetting->m_ViewTime&3) {
+		m_RestCount.offset = 0;
+		m_TimeGraphic.dib = ResourceManager.Get(RID_MAIN);
+		m_TimeGraphic.offset=0;
+		m_TimeGraphic.rect.left=416;
+		m_TimeGraphic.rect.top=112;
+		m_TimeGraphic.rect.right=432;
+		m_TimeGraphic.rect.bottom=128;
+		m_NavigationBar->Add(&m_TimeGraphic);
+		m_TimeCount.Set(new CTextDIB32);
+		m_NavigationBar->Add(&m_TimeCount);
+	}
 	// メニュー
 	m_Message = new CTextDIB32;
 	m_Message->GetFont()->SetSize(32);
@@ -115,6 +118,8 @@ void CGameScene::OnDraw(CDIB32 *lp)
 				break;
 			}
 			if (m_pRecorder) m_pRecorder->Record();
+			m_nTime++;
+			UpdateTime();
 			m_Map->OnMove();
 			if (m_Map->GetGotBanana()==m_Map->GetTotalBanana()) {
 				StageClear();
@@ -268,6 +273,8 @@ void CGameScene::StartGame(int stage)
 	m_Message->GetFont()->SetText(t);
 	m_Message->UpdateText();
 	m_MessageCount = 40;
+	m_nTime = 0;
+	UpdateTime();
 	m_State = GSS_PLAYING;
 	theApp->GetBGM()->Play(m_Map->GetBGM());
 	m_Select->Clear();
@@ -419,4 +426,47 @@ void CGameScene::SaveReplay()
 	if (m_pRecorder==NULL) return;
 	m_pRecorder->Save(m_StageFile, m_nStage);
 	DELETE_SAFE(m_pRecorder);
+}
+
+void CGameScene::UpdateTime()
+{
+	switch (theSetting->m_ViewTime&3){
+	case 0:{
+		return;
+		   }
+	case 1:{
+		m_TimeCount.text->GetFont()->SetText("%04d", m_nTime);
+		break;
+		   }
+	case 2:{
+		int hour =  m_nTime/40 /60 /60;
+		int min  = (m_nTime/40 /60)%60;
+		int sec  = (m_nTime/40)%60;
+		if(m_nTime<10*60*40) {
+			m_TimeCount.text->GetFont()->SetText("%d:%02d", min, sec);
+		}ef(m_nTime<60*60*40) {
+			m_TimeCount.text->GetFont()->SetText("%02d:%02d", min, sec);
+		}else {
+			m_TimeCount.text->GetFont()->SetText("%d:%02d:%02d", hour, min, sec);
+		}
+		break;
+		   }
+	case 3:{
+		int hour =  m_nTime/40 /60 /60;
+		int min  = (m_nTime/40 /60)%60;
+		int sec  = (m_nTime/40)%60;
+		int msec = (m_nTime%40)*25;
+		if(m_nTime<60*40) {
+			m_TimeCount.text->GetFont()->SetText("%02d.%03d", sec, msec);
+		}ef(m_nTime<10*60*40) {
+			m_TimeCount.text->GetFont()->SetText("%d:%02d.%03d", min, sec, msec);
+		}ef(m_nTime<60*60*40) {
+			m_TimeCount.text->GetFont()->SetText("%02d:%02d.%03d", min, sec, msec);
+		}else {
+			m_TimeCount.text->GetFont()->SetText("%d:%02d:%02d.%03d", hour, min, sec, msec);
+		}
+		break;
+		   }
+	}
+	m_TimeCount.Update();
 }
