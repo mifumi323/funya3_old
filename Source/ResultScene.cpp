@@ -16,7 +16,7 @@
 CResultScene::CResultScene()
 {
 	m_nLines = m_nScroll = m_nFocus = 0;
-	m_NavigationBar = NULL;
+//	m_NavigationBar = NULL;
 	m_TextNavi.dib = NULL;
 	m_TextTitle = NULL;
 	m_TextResult = NULL;
@@ -24,7 +24,7 @@ CResultScene::CResultScene()
 
 CResultScene::~CResultScene()
 {
-	DELETE_SAFE(m_NavigationBar);
+//	DELETE_SAFE(m_NavigationBar);
 	DELETE_SAFE(m_TextNavi.dib);
 	DELETE_SAFE(m_TextTitle);
 	DELETE_SAFE(m_TextResult);
@@ -45,9 +45,10 @@ void CResultScene::OnInit()
 	m_TextResult->GetFont()->SetWeight(FW_BOLD);
 	m_TextResult->GetFont()->SetHeight(24);
 	// ナビゲーションバー
-	m_NavigationBar = new Cf3NavigationBar;
+//	m_NavigationBar = new Cf3NavigationBar;
+	f3Navi.Clear();
 	m_TextNavi.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_TextNavi);
+	f3Navi.Add(&m_TextNavi);
 	// プレイ記録
 	Add("バナナ取得総数：%d個",
 		(string)"今までに取ったバナナの数です。"+
@@ -128,7 +129,7 @@ void CResultScene::OnDraw(CDIB32 *lp)
 		SetRect(&rc, 352+16*(m_nIcon%4), 96+16*(m_nIcon/4), 368+16*(m_nIcon%4), 112+16*(m_nIcon/4));
 		lp->Blt(m_Icon,16,80+24*(m_nFocus-m_nScroll),&rc);
 	}
-	m_NavigationBar->OnDraw(lp);
+	f3Navi.OnDraw(lp);
 }
 
 void __cdecl CResultScene::Add(string summary, string description, ...)

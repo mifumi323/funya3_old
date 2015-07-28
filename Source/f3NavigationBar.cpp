@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 
 const float NaviSpeed = 0.5f;
+Cf3NavigationBar f3Navi;
 
 //////////////////////////////////////////////////////////////////////
 // \’z/Á–Å
@@ -15,7 +16,6 @@ const float NaviSpeed = 0.5f;
 Cf3NavigationBar::Cf3NavigationBar()
 {
 	m_ScrollTo = m_Scroll = 0;
-	m_Back = ResourceManager.Get(RID_NAVI);
 }
 
 Cf3NavigationBar::~Cf3NavigationBar()
@@ -39,7 +39,7 @@ void Cf3NavigationBar::OnDraw(CDIB32 *lp)
 	}else{
 		m_ScrollTo = m_Scroll = 0;
 	}
-	lp->BltFast(m_Back,0,224);
+	lp->BltFast(ResourceManager.Get(RID_NAVI),0,224);
 	for(it = m_PlaneList.begin();it!=m_PlaneList.end();it++){
 		lp->Blt((*it)->dib,o-m_Scroll,224,&(*it)->rect);
 		if (t>320) {
@@ -62,9 +62,4 @@ void Cf3NavigationBar::Add(TNavi *lpPlane)
 		lpPlane->rect.right=sx;
 		lpPlane->rect.bottom=sy;
 	}
-}
-
-void Cf3NavigationBar::Delete(TNavi *lpPlane)
-{
-	m_PlaneList.remove(lpPlane);
 }

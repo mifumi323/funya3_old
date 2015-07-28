@@ -14,6 +14,8 @@
 class CSettingScene : public CSceneBase  
 {
 public:
+	void OnDraw(CDIB32 *lp);
+	void OnInit();
 	CSettingScene();
 	virtual ~CSettingScene();
 

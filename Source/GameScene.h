@@ -15,13 +15,13 @@ class Cf3Map;
 class Cf3StageFile;
 class Cf3Select;
 class Cf3Replay;
+class Cf3HTMLDIB32;
 
 class CGameScene : public CSceneBase  
 {
 private:
 	Cf3Map			*m_Map;
 	Cf3StageFile	*m_StageFile;
-	Cf3NavigationBar*m_NavigationBar;
 	Cf3Select		*m_Select;
 	CDIB32			*m_Temparature;
 
@@ -37,10 +37,10 @@ private:
 	TTextNavi		m_StageTitle;
 	TNavi			m_RestGraphic;
 	TTextNavi		m_RestCount;
-	TNavi				m_TimeGraphic;
-	TTextNavi			m_TimeCount;
+	TNavi			m_TimeGraphic;
+	TTextNavi		m_TimeCount;
 
-	CTextDIB32		*m_Message;
+	Cf3HTMLDIB32	*m_Message;
 	int				m_MessageCount;
 
 	Cf3Replay		*m_pRecorder;

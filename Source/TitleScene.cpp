@@ -20,7 +20,6 @@ CTitleScene::CTitleScene()
 	m_Map=NULL;
 	m_StageFile=NULL;
 	m_Select=NULL;
-	m_NavigationBar=NULL;
 	m_TextStageFile=NULL;
 }
 
@@ -29,7 +28,6 @@ CTitleScene::~CTitleScene()
 	delete m_Map;
 	delete m_StageFile;
 	delete m_Select;
-	delete m_NavigationBar;
 	delete m_TextStageFile;
 	delete m_TextNavi.text;
 }
@@ -37,7 +35,7 @@ CTitleScene::~CTitleScene()
 void CTitleScene::OnInit()
 {
 	FindAllStageFile();
-	m_NavigationBar = new Cf3NavigationBar;
+	f3Navi.Clear();
 	m_StageFile = new Cf3StageFile;
 	m_Select = new Cf3Select;
 	m_Select->SetPos(160-32*5/2,120+8-32);
@@ -49,7 +47,7 @@ void CTitleScene::OnInit()
 	m_TextNavi.text->GetFont()->SetSize(16);
 	m_TextNavi.text->GetFont()->SetColor(0x000020);
 	m_TextNavi.text->GetFont()->SetBackColor(0x303030);
-	m_NavigationBar->Add(&m_TextNavi);
+	f3Navi.Add(&m_TextNavi);
 	SetStage();
 	if (m_Select->GetSelected()==0) {
 		SetMap(0);
@@ -100,7 +98,7 @@ void CTitleScene::OnDraw(CDIB32 *lp)
 		SIZE sz = { 320, h*320/w };
 		lp->Blt(m_TextStageFile,0,120-24-32-sz.cy/2,NULL, &sz);
 	}
-	m_NavigationBar->OnDraw(lp);
+	f3Navi.OnDraw(lp);
 }
 
 void CTitleScene::FindAllStageFile()
@@ -163,6 +161,12 @@ void CTitleScene::SetStage()
 			CopyMemory(strbuf,str,size);
 			navi+="　コメント：";
 			navi+=strbuf;
+		}
+		{
+			char buf[256];
+			BYTE*Buf = m_StageFile->GetStageData(CT_STGC);
+			sprintf(buf,"　ステージ数：全%d面", Buf?*Buf:1);
+			navi+=buf;
 		}
 		m_TextNavi.text->GetFont()->SetText(navi);
 		m_TextNavi.Update();

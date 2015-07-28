@@ -21,7 +21,7 @@ private:
 	Cf3Map					*m_Map;
 	Cf3StageFile			*m_StageFile;
 	Cf3Select				*m_Select;
-	Cf3NavigationBar		*m_NavigationBar;
+//	Cf3NavigationBar		*m_NavigationBar;
 
 	list<string>			m_StageList;
 	list<string>::iterator	m_itStageFile;

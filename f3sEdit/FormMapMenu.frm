@@ -3,7 +3,7 @@ Begin VB.Form FormMapMenu
    Caption         =   "マップメニュー"
    ClientHeight    =   3090
    ClientLeft      =   165
-   ClientTop       =   855
+   ClientTop       =   735
    ClientWidth     =   4680
    LinkTopic       =   "Form1"
    ScaleHeight     =   3090
@@ -38,6 +38,29 @@ Begin VB.Form FormMapMenu
       Begin VB.Menu mnuLayer2 
          Caption         =   "上層"
          Checked         =   -1  'True
+      End
+      Begin VB.Menu ASASASASS 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuLeftClick 
+         Caption         =   "左クリック"
+         Begin VB.Menu mnuLeftDraw 
+            Caption         =   "描画"
+            Checked         =   -1  'True
+         End
+         Begin VB.Menu mnuLeftRect 
+            Caption         =   "四角"
+         End
+      End
+      Begin VB.Menu mnuRightClick 
+         Caption         =   "右クリック"
+         Begin VB.Menu mnuRightSpuit 
+            Caption         =   "スポイト"
+            Checked         =   -1  'True
+         End
+         Begin VB.Menu mnuRightErase 
+            Caption         =   "消去"
+         End
       End
       Begin VB.Menu ASASASAS 
          Caption         =   "-"
@@ -75,6 +98,30 @@ End Sub
 Private Sub mnuLayer2_Click()
     Parent.Layer2 = Not mnuLayer2.Checked
     Parent.OnDraw
+End Sub
+
+Private Sub mnuLeftDraw_Click()
+    mnuLeftDraw.Checked = True
+    mnuLeftRect.Checked = False
+    Parent.LeftClick = EditDraw
+End Sub
+
+Private Sub mnuLeftRect_Click()
+    mnuLeftDraw.Checked = False
+    mnuLeftRect.Checked = True
+    Parent.LeftClick = EditRect
+End Sub
+
+Private Sub mnuRightErase_Click()
+    mnuRightSpuit.Checked = False
+    mnuRightErase.Checked = True
+    Parent.RightClick = EditErase
+End Sub
+
+Private Sub mnuRightSpuit_Click()
+    mnuRightSpuit.Checked = True
+    mnuRightErase.Checked = False
+    Parent.RightClick = EditSpuit
 End Sub
 
 Private Sub mnuShiftDown_Click()

@@ -11,6 +11,7 @@
 #include "ReplayScene.h"
 #include "ExplainScene.h"
 #include "ConfigScene.h"
+#include "SettingScene.h"
 #include "ResultScene.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -37,6 +38,7 @@ CScene* Cf3SceneFactory::CreateScene(int nScene) {
 	case REPLAY_SCENE:	lp = new CReplayScene; break;
 	case EXPLAIN_SCENE:	lp = new CExplainScene; break;
 	case CONFIG_SCENE:	lp = new CConfigScene; break;
+	case SETTING_SCENE:	lp = new CSettingScene; break;
 	case RESULT_SCENE:	lp = new CResultScene; break;
 	default:			lp = NULL; // error..
 	}

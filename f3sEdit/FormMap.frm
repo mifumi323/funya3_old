@@ -91,6 +91,13 @@ Public Layer0 As Boolean
 Public Layer1 As Boolean
 Public Layer2 As Boolean
 
+Dim OldMX As Integer, OldMY As Integer
+Dim StartMX As Integer, StartMY As Integer
+
+Public LeftClick As EnumEditMode
+Public RightClick As EnumEditMode
+Public EditMode As EnumEditMode
+
 Private Sub cmdMapChip_Click()
     MDIFormMain.mnuViewMapChip.Checked = True
     FormMapChip.Show vbModeless, MDIFormMain
@@ -135,6 +142,11 @@ Private Sub Form_Load()
     Layer0 = True
     Layer1 = True
     Layer2 = True
+    OldMX = -1
+    OldMY = -1
+    LeftClick = EditDraw
+    RightClick = EditSpuit
+    EditMode = EditNone
     Buttons.Add cmdMapChip
     Buttons.Add cmdTitle
     Buttons.Add cmdSize
@@ -184,25 +196,29 @@ Private Sub picMap_KeyDown(KeyCode As Integer, Shift As Integer)
 End Sub
 
 Private Sub picMap_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    With StageData
-        Dim MX As Integer, MY As Integer
-        MX = (X + hscX.Value * .GetMagnificationX(EditLevel)) \ 32: MY = (Y + vscY.Value * .GetMagnificationY(EditLevel)) \ 32
-        If Button = 1 Then
-            If .SetMapChip(EditLevel, MX, MY, SelectedChip) Then OnDraw
-        ElseIf Button = 2 Then
-            If SelectedChip <> .GetMapChip(EditLevel, MX, MY) Then
-                SelectedChip = .GetMapChip(EditLevel, MX, MY)
-                If MDIFormMain.mnuViewMapChip.Checked Then
-                    FormMapChip.picChip.Refresh
-                    FormMapChip.picChara.Refresh
-                End If
-            End If
-        End If
-    End With
+    If EditMode <> EditNone Then
+        EditMode = EditNone
+        OnDraw
+    ElseIf Button = vbLeftButton Then
+        EditMode = LeftClick
+        MouseEvent MouseDown, Shift, X, Y
+    ElseIf Button = vbRightButton Then
+        EditMode = RightClick
+        MouseEvent MouseDown, Shift, X, Y
+    End If
 End Sub
 
 Private Sub picMap_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    picMap_MouseDown Button, Shift, X, Y
+    MouseEvent MouseMove, Shift, X, Y
+End Sub
+
+Private Sub picMap_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    MouseEvent MouseUp, Shift, X, Y
+    EditMode = EditNone
+End Sub
+
+Private Sub picMap_Resize()
+    OnDraw
 End Sub
 
 Public Sub OnDraw()
@@ -213,6 +229,7 @@ Public Sub OnDraw()
         Dim CX As Long, CY As Long
         Dim VX As Long, VY As Long
         Dim DestDC As Long, ChipDC As Long, MaskDC As Long
+        Dim Chip As Integer
         DestDC = picMap.hdc
         '‰º‘w
         ChipDC = Stages.GetMapChipDC(0)
@@ -223,8 +240,13 @@ Public Sub OnDraw()
             For Y = StartY To EndY Step 32
                 MX = X \ 32: MY = Y \ 32
                 If MX < StageData.GetWidth(0) And MY < StageData.GetHeight(0) And Layer0 Then
-                    CX = StageData.GetMapChip(0, MX, MY) Mod 16
-                    CY = StageData.GetMapChip(0, MX, MY) \ 16
+                    If EditLevel = 0 And EditMode = EditRect And IsIn(StartMX, MX, OldMX) And IsIn(StartMY, MY, OldMY) Then
+                        Chip = SelectedChip
+                    Else
+                        Chip = StageData.GetMapChip(0, MX, MY)
+                    End If
+                    CX = Chip Mod 16
+                    CY = Chip \ 16
                     VX = MX * 32 - StartX
                     VY = MY * 32 - StartY
                     If CY < 15 Then
@@ -245,8 +267,13 @@ Public Sub OnDraw()
                 For Y = StartY To EndY Step 32
                     MX = X \ 32: MY = Y \ 32
                     If MX < StageData.GetWidth(1) And MY < StageData.GetHeight(1) Then
-                        CX = StageData.GetMapChip(1, MX, MY) Mod 16
-                        CY = StageData.GetMapChip(1, MX, MY) \ 16
+                        If EditLevel = 1 And EditMode = EditRect And IsIn(StartMX, MX, OldMX) And IsIn(StartMY, MY, OldMY) Then
+                            Chip = SelectedChip
+                        Else
+                            Chip = StageData.GetMapChip(1, MX, MY)
+                        End If
+                        CX = Chip Mod 16
+                        CY = Chip \ 16
                         VX = MX * 32 - StartX
                         VY = MY * 32 - StartY
                         If CY < 15 Then
@@ -270,8 +297,13 @@ Public Sub OnDraw()
                 For Y = StartY To EndY Step 32
                     MX = X \ 32: MY = Y \ 32
                     If MX < StageData.GetWidth(2) And MY < StageData.GetHeight(2) Then
-                        CX = StageData.GetMapChip(2, MX, MY) Mod 16
-                        CY = StageData.GetMapChip(2, MX, MY) \ 16
+                        If EditLevel = 2 And EditMode = EditRect And IsIn(StartMX, MX, OldMX) And IsIn(StartMY, MY, OldMY) Then
+                            Chip = SelectedChip
+                        Else
+                            Chip = StageData.GetMapChip(2, MX, MY)
+                        End If
+                        CX = Chip Mod 16
+                        CY = Chip \ 16
                         VX = MX * 32 - StartX
                         VY = MY * 32 - StartY
                         If CY < 15 Then
@@ -285,10 +317,6 @@ Public Sub OnDraw()
     End With
 End Sub
 
-Private Sub picMap_Resize()
-    OnDraw
-End Sub
-
 Private Sub vscY_Change()
     OnDraw
 End Sub
@@ -300,4 +328,46 @@ End Sub
 Public Sub SetStageData(Data As clsStage)
     Set StageData = Data
     Caption = StageData.GetTitle
+End Sub
+
+Private Sub MouseEvent(MouseEvent As EnumMouseEvent, Shift As Integer, X As Single, Y As Single)
+    With StageData
+        Dim MX As Integer, MY As Integer
+        Dim Dirty As Boolean
+        MX = (X + hscX.Value * .GetMagnificationX(EditLevel)) \ 32
+        MY = (Y + vscY.Value * .GetMagnificationY(EditLevel)) \ 32
+        Dirty = OldMX <> MX Or OldMY <> MY Or MouseEvent = MouseDown
+        Select Case EditMode
+        Case EditDraw
+            If .SetMapChip(EditLevel, MX, MY, SelectedChip) Then Dirty = True
+        Case EditRect
+            Select Case MouseEvent
+            Case MouseDown
+                StartMX = MX
+                StartMY = MY
+            Case MouseMove
+            Case MouseUp
+                Dim I As Integer, J As Integer
+                For I = StartMX To MX
+                    For J = StartMY To MY
+                        If .SetMapChip(EditLevel, I, J, SelectedChip) Then Dirty = True
+                    Next
+                Next
+            End Select
+        Case EditSpuit
+            If SelectedChip <> .GetMapChip(EditLevel, MX, MY) Then
+                SelectedChip = .GetMapChip(EditLevel, MX, MY)
+                If MDIFormMain.mnuViewMapChip.Checked Then
+                    FormMapChip.picChip.Refresh
+                    FormMapChip.picChara.Refresh
+                End If
+            End If
+            Dirty = False
+        Case EditErase
+            If .SetMapChip(EditLevel, MX, MY, 0) Then Dirty = True
+        End Select
+        OldMX = MX
+        OldMY = MY
+        If Dirty Then OnDraw
+    End With
 End Sub

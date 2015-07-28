@@ -41,18 +41,20 @@ public:
 class Cf3NavigationBar  
 {
 protected:
-	CDIB32				*m_Back;
 	list<TNavi*>		m_PlaneList;
 
 	float	m_Scroll;
 	float	m_ScrollTo;
 public:
-	void Delete(TNavi *lpPlane);
+	void Delete(TNavi *lpPlane) { m_PlaneList.remove(lpPlane); }
+	void Clear() { m_ScrollTo = m_Scroll = 0; m_PlaneList.clear(); }
 	void Add(TNavi *lpPlane);
 	void OnDraw(CDIB32 *lp);
 	Cf3NavigationBar();
 	virtual ~Cf3NavigationBar();
 
 };
+
+extern Cf3NavigationBar f3Navi;
 
 #endif // !defined(AFX_F3NAVIGATIONBAR_H__EE5686CF_4B7B_48CE_B6CD_5CED4C4A3140__INCLUDED_)

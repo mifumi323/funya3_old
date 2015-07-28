@@ -656,7 +656,7 @@ Cf3MapObjectBase** Cf3Map::GetMapObjects(int x1, int y1, int x2, int y2, int id)
 		for (int y=y1; y<=y2; y++) {
 			o = m_pObject[GetIndex(x, y)];
 			while (o!=NULL) {
-				if (o->GetID()==id) {
+				if (o->GetID()==id&&o->IsValid()) {
 					m_NearObject[i++] = o;
 					m_NearObject[i] = NULL;
 				}

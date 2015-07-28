@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "SettingScene.h"
 
+#include "RandomReplay.h"
+
 //////////////////////////////////////////////////////////////////////
 // \’z/Á–Å
 //////////////////////////////////////////////////////////////////////
@@ -17,4 +19,18 @@ CSettingScene::CSettingScene()
 CSettingScene::~CSettingScene()
 {
 
+}
+
+void CSettingScene::OnInit()
+{
+	// ƒŠƒvƒŒƒCŠÖŒW
+	f3Replay.Enter();
+	f3Navi.Clear();
+}
+
+void CSettingScene::OnDraw(CDIB32 *lp)
+{
+	lp->Clear(0);
+	f3Replay.Replay(lp);
+	f3Navi.OnDraw(lp);
 }

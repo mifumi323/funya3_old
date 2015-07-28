@@ -10,6 +10,20 @@ Public Stages As clsStageFile
 Public EditLevel As Integer
 Public SelectedChip As Byte
 
+Public Enum EnumEditMode
+    EditNone
+    EditDraw
+    EditRect
+    EditSpuit
+    EditErase
+End Enum
+
+Public Enum EnumMouseEvent
+    MouseDown
+    MouseMove
+    MouseUp
+End Enum
+
 Public Function GetFullFileName(fn As String) As String
     GetFullFileName = Replace(App.Path & "\" & fn, "\\", "\")
 End Function
@@ -63,3 +77,7 @@ Public Sub TestPlay(ByVal num As Integer)
     If Stages.GetFileName = "" Then Exit Sub
     Shell "funya3.exe TEST """ & Stages.GetFileName & """ " & num & IIf(MDIFormMain.mnuOptionViewHit.Checked, " VISIBLEHIT", ""), vbNormalFocus
 End Sub
+
+Public Function IsIn(ByVal Lower As Integer, ByVal Value As Integer, ByVal Upper As Integer)
+    IsIn = (Lower <= Value And Value <= Upper) Or (Lower >= Value And Value >= Upper)
+End Function

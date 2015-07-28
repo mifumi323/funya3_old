@@ -12,14 +12,13 @@
 #include "SceneBase.h"
 
 class Cf3Map;
-class Cf3NavigationBar;
 class Cf3MapObjectfunya;
 
 class CExplainScene : public CSceneBase  
 {
 private:
 	Cf3Map				*m_Map;
-	Cf3NavigationBar	*m_NavigationBar;
+//	Cf3NavigationBar	*m_NavigationBar;
 	Cf3MapObjectfunya	*m_funya;
 	TTextNavi			m_Text;
 

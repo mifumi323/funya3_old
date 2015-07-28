@@ -88,8 +88,9 @@ void Cf3MapObjectmrframe::OnMove()
 	m_funya->OnMove();
 	SetPos(m_funya->m_X,m_funya->m_Y);
 	if (m_funya->IsDied()) {
-		if (--m_nLife==0) {
+		if (--m_nLife<=0) {
 			Kill();
+			m_funya->Kill();
 			new Cf3MapObjectEffect(m_X, m_Y, 0);
 		}
 	}

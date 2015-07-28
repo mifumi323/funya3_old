@@ -42,7 +42,7 @@ CExplainScene::~CExplainScene()
 	theSetting->m_Gravity = m_OldGravity;
 	theSetting->m_Hyper = m_OldHyper;
 	delete m_Map;
-	delete m_NavigationBar;
+//	delete m_NavigationBar;
 	delete m_Text.text;
 }
 
@@ -50,13 +50,14 @@ void CExplainScene::OnInit()
 {
 	Cf3MapObjectMain::SetInput(&KeyInput);
 	// ナビゲーション
-	m_NavigationBar = new Cf3NavigationBar;
+//	m_NavigationBar = new Cf3NavigationBar;
+	f3Navi.Clear();
 	CTextDIB32* text = new CTextDIB32;
 //	text->GetFont()->SetSize(16);
 //	text->GetFont()->SetColor(0x000020);
 //	text->GetFont()->SetBackColor(0x303030);
 	m_Text.Set(text);
-	m_NavigationBar->Add(&m_Text);
+	f3Navi.Add(&m_Text);
 	// 説明用の255*255のマップの入ったファイルイメージを生成する
 	// "funya3s1"		8Byte
 	// データサイズ		4Byte*2
@@ -447,5 +448,5 @@ void CExplainScene::OnDraw(CDIB32 *lp)
 	}
 	m_Map->OnPreDraw();
 	m_Map->OnDraw(lp);
-	m_NavigationBar->OnDraw(lp);
+	f3Navi.OnDraw(lp);
 }

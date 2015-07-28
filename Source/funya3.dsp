@@ -239,6 +239,10 @@ SOURCE=.\AVIRecorder.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\f3HTMLDIB32.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\f3Input.cpp
 # End Source File
 # Begin Source File
@@ -569,6 +573,10 @@ SOURCE=.\DirectMusicFader.h
 # Begin Source File
 
 SOURCE=.\ExplainScene.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\f3HTMLDIB32.h
 # End Source File
 # Begin Source File
 

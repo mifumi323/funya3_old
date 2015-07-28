@@ -21,13 +21,13 @@ bool CReplayScene::record = false;
 
 CReplayScene::CReplayScene()
 {
-	m_NavigationBar = NULL;
+//	m_NavigationBar = NULL;
 	m_pPlayer = NULL;
 }
 
 CReplayScene::~CReplayScene()
 {
-	DELETE_SAFE(m_NavigationBar);
+//	DELETE_SAFE(m_NavigationBar);
 	delete m_BananaCount.text;
 	delete m_StageTitle.text;
 	if (theSetting->m_ViewTime&3) delete m_TimeCount.text;
@@ -43,18 +43,19 @@ void CReplayScene::OnInit()
 	m_Message->GetFont()->SetColor(0xffffff);
 	m_Message->GetFont()->SetBackColor(0x303030);
 	// ナビゲーション
-	m_NavigationBar = new Cf3NavigationBar;
+//	m_NavigationBar = new Cf3NavigationBar;
+	f3Navi.Clear();
 	m_StageTitle.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_StageTitle);
+	f3Navi.Add(&m_StageTitle);
 	m_BananaGraphic.dib = ResourceManager.Get(RID_MAIN);
 	m_BananaGraphic.offset=0;
 	m_BananaGraphic.rect.left=416;
 	m_BananaGraphic.rect.top=96;
 	m_BananaGraphic.rect.right=432;
 	m_BananaGraphic.rect.bottom=112;
-	m_NavigationBar->Add(&m_BananaGraphic);
+	f3Navi.Add(&m_BananaGraphic);
 	m_BananaCount.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_BananaCount);
+	f3Navi.Add(&m_BananaCount);
 	if (theSetting->m_ViewTime&3) {
 		m_BananaCount.offset = 0;
 		m_TimeGraphic.dib = ResourceManager.Get(RID_MAIN);
@@ -63,9 +64,9 @@ void CReplayScene::OnInit()
 		m_TimeGraphic.rect.top=112;
 		m_TimeGraphic.rect.right=432;
 		m_TimeGraphic.rect.bottom=128;
-		m_NavigationBar->Add(&m_TimeGraphic);
+		f3Navi.Add(&m_TimeGraphic);
 		m_TimeCount.Set(new CTextDIB32);
-		m_NavigationBar->Add(&m_TimeCount);
+		f3Navi.Add(&m_TimeCount);
 	}
 	// リプレイ関係
 	Cf3MapObjectMain::SetInput(&ReplayInput);
@@ -124,7 +125,7 @@ void CReplayScene::OnDraw(CDIB32 *lp)
 		m_BananaCount.Update();
 	}
 	m_pPlayer->OnDraw(lp);
-	m_NavigationBar->OnDraw(lp);
+	f3Navi.OnDraw(lp);
 	if (m_Phase) {
 		int w,h;
 		m_Message->GetSize(w,h);

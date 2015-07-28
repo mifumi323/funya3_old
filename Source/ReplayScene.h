@@ -19,7 +19,7 @@ class CReplayScene : public CSceneBase
 {
 protected:
 	void UpdateTime();
-	Cf3NavigationBar	*m_NavigationBar;
+//	Cf3NavigationBar	*m_NavigationBar;
 	TNavi				m_BananaGraphic;
 	TTextNavi			m_BananaCount;
 	TTextNavi			m_StageTitle;

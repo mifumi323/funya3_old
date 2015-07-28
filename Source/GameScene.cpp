@@ -11,13 +11,14 @@
 #include "yaneSDK/yaneFile.h"
 #include "ResourceManager.h"
 #include "f3Replay.h"
+#include "f3HTMLDIB32.h"
 
 #define CENTERX 160
 #define CENTERY 104
 
 bool CGameScene::m_bTest = false;
 bool CGameScene::m_bVisibleHit = false;
-int CGameScene::m_nStage = 0;
+int  CGameScene::m_nStage = 0;
 
 //////////////////////////////////////////////////////////////////////
 // 構築/消滅
@@ -31,7 +32,6 @@ CGameScene::~CGameScene()
 {
 	delete m_Map;
 	delete m_StageFile;
-	delete m_NavigationBar;
 	delete m_BananaCount.text;
 	delete m_StageTitle.text;
 	delete m_RestCount.text;
@@ -58,28 +58,28 @@ void CGameScene::OnInit()
 	m_nPenalty = (Buf?*((WORD*)Buf):100);
 	m_Map = NULL;
 	// ナビゲーション
-	m_NavigationBar = new Cf3NavigationBar;
+	f3Navi.Clear();
 	m_StageTitle.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_StageTitle);
+	f3Navi.Add(&m_StageTitle);
 	m_BananaGraphic.dib = ResourceManager.Get(RID_MAIN);
 	m_BananaGraphic.offset=0;
 	m_BananaGraphic.rect.left=416;
 	m_BananaGraphic.rect.top=96;
 	m_BananaGraphic.rect.right=432;
 	m_BananaGraphic.rect.bottom=112;
-	m_NavigationBar->Add(&m_BananaGraphic);
+	f3Navi.Add(&m_BananaGraphic);
 	m_BananaCount.offset = 0;
 	m_BananaCount.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_BananaCount);
+	f3Navi.Add(&m_BananaCount);
 	m_RestGraphic.dib = ResourceManager.Get(RID_MAIN);
 	m_RestGraphic.offset=0;
 	m_RestGraphic.rect.left=352;
 	m_RestGraphic.rect.top=96;
 	m_RestGraphic.rect.right=368;
 	m_RestGraphic.rect.bottom=112;
-	m_NavigationBar->Add(&m_RestGraphic);
+	f3Navi.Add(&m_RestGraphic);
 	m_RestCount.Set(new CTextDIB32);
-	m_NavigationBar->Add(&m_RestCount);
+	f3Navi.Add(&m_RestCount);
 	if (theSetting->m_ViewTime&3) {
 		m_RestCount.offset = 0;
 		m_TimeGraphic.dib = ResourceManager.Get(RID_MAIN);
@@ -88,15 +88,16 @@ void CGameScene::OnInit()
 		m_TimeGraphic.rect.top=112;
 		m_TimeGraphic.rect.right=432;
 		m_TimeGraphic.rect.bottom=128;
-		m_NavigationBar->Add(&m_TimeGraphic);
+		f3Navi.Add(&m_TimeGraphic);
 		m_TimeCount.Set(new CTextDIB32);
-		m_NavigationBar->Add(&m_TimeCount);
+		f3Navi.Add(&m_TimeCount);
 	}
 	// メニュー
-	m_Message = new CTextDIB32;
-	m_Message->GetFont()->SetSize(32);
-	m_Message->GetFont()->SetColor(0xffffff);
-	m_Message->GetFont()->SetBackColor(0x303030);
+	m_Message = new Cf3HTMLDIB32;
+	m_Message->SetFontSize(32);
+	m_Message->SetAlign(AlignCenter);
+	//m_Message->GetFont()->SetColor(0xffffff);
+	//m_Message->GetFont()->SetBackColor(0x303030);
 	m_Select = new Cf3Select;
 	m_Select->SetPos(64,64);
 	// その他
@@ -185,8 +186,8 @@ void CGameScene::OnDraw(CDIB32 *lp)
 			JumpScene(FIRST_SCENE);
 		}else {
 			if (m_MessageCount%40==0&&m_MessageCount>0) {
-				m_Message->GetFont()->SetText("Continue?%2d",m_MessageCount/40-1);
-				m_Message->UpdateText();
+				m_Message->SetText("Continue?%2d",m_MessageCount/40-1);
+				m_Message->Update();
 			}
 			if (f3Input.GetKeyPushed(F3KEY_PAUSE)) {
 				if (theSetting->m_Banana>=m_nPenalty&&m_Select->GetSelected()==0) {
@@ -208,33 +209,33 @@ void CGameScene::OnDraw(CDIB32 *lp)
 	switch (m_State) {
 	case GSS_PLAYING: {
 		m_Map->OnDraw(lp, m_bTest&&m_bVisibleHit);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					  }
 	case GSS_PAUSED: {
 		m_Map->OnDraw(lp);
 		if (theSetting->m_ESP) lp->BlendBlt(m_Temparature,0,0,0x808080,0x7f7f7f);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					 }
 	case GSS_CLEARED: {
 		m_Map->OnDraw(lp);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					 }
 	case GSS_ALLCLEARED: {
 		m_Map->OnDraw(lp);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					 }
 	case GSS_DEAD: {
 		m_Map->OnDraw(lp);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					 }
 	case GSS_GAMEOVER: {
 		m_Map->OnDraw(lp);
-		m_NavigationBar->OnDraw(lp);
+		f3Navi.OnDraw(lp);
 		break;
 					 }
 	default: {
@@ -245,9 +246,12 @@ void CGameScene::OnDraw(CDIB32 *lp)
 		m_Message->GetSize(w,h);
 		m_Select->GetSize(sw,sh);
 		if (!f3Input.GetKeyPressed(F3KEY_SMILE)) {
-			if (w<=320) lp->Blt(m_Message,160-w/2,120-sh/2-h/2);
-			else {
+			if (w<=320) {
+				lp->SubColorBlt(m_Message,160-w/2+2,120-sh/2-h/2+2);
+				lp->Blt(m_Message,160-w/2,120-sh/2-h/2);
+			}else {
 				SIZE sz = { 320, h*320/w };
+				lp->SubColorBlt(m_Message,2,120-sh/2-sz.cy/2+2,NULL, &sz);
 				lp->Blt(m_Message,0,120-sh/2-sz.cy/2,NULL, &sz);
 			}
 		}
@@ -270,9 +274,9 @@ void CGameScene::StartGame(int stage)
 	m_StageTitle.text->GetFont()->SetText("ステージ%d：%s",stage+1,t.c_str());
 	m_StageTitle.Update();
 	t = m_Map->GetTitle();
-	t = replace_all(t, (string)"\\n", (string)"\n");
-	m_Message->GetFont()->SetText(t);
-	m_Message->UpdateText();
+	t = replace_all(t, (string)"\\n", (string)"<br>");
+	m_Message->SetText(t);
+	m_Message->Update();
 	m_MessageCount = 40;
 	m_nTime = 0;
 	UpdateTime();
@@ -292,8 +296,8 @@ void CGameScene::StageClear()
 	m_BananaCount.text->GetFont()->SetText(
 		"%03d/%03d",m_Map->GetGotBanana(), m_Map->GetTotalBanana());
 	m_BananaCount.Update();
-	m_Message->GetFont()->SetText("Stage Clear!!");
-	m_Message->UpdateText();
+	m_Message->SetText("Stage Clear!!");
+	m_Message->Update();
 	m_MessageCount = -1;
 	m_State = GSS_CLEARED;
 	theSetting->m_Banana += m_Map->GetTotalBanana();
@@ -305,8 +309,8 @@ void CGameScene::Miss()
 	if (CApp::binaryrandom(theSetting->m_RecordMiss)) SaveReplay();
 	m_RestGraphic.rect.left=384;
 	m_RestGraphic.rect.right=400;
-	m_Message->GetFont()->SetText("Miss!!");
-	m_Message->UpdateText();
+	m_Message->SetText("Miss!!");
+	m_Message->Update();
 	m_MessageCount = -1;
 	if (!m_bTest) {
 		m_nRest--;
@@ -321,42 +325,72 @@ void CGameScene::Miss()
 
 void CGameScene::Ending()
 {
+	DWORD size;
 	m_State = GSS_ALLCLEARED;
-	m_Message->GetFont()->SetText("All Clear!!");
-	m_Message->UpdateText();
-	m_MessageCount = -1;
+
+	// エンディングメッセージ
+	string ending = "All Clear!!<font color=red size=-1><br>";
+	char*str=(char*)m_StageFile->GetStageData(CT_ENDM,&size);
+	if (str!=NULL) {
+		char msg[256];
+		size = min(size,255);
+		CopyMemory(msg,str,size);
+		msg[size]='\0';
+		ending += (string)"<font color=yellow size=-1><b>"+msg+"</b></font><br>";
+	}
+
 	theApp->GetBGM()->Play(BGMN_ENDING);
 	// Secret 1!!
-	theSetting->m_Smiles++;
+	if (++theSetting->m_Smiles==1)				ending += "<br>Secret 1!!";
 	// Secret 2!!
-	if (CFile::GetPureFileNameOf(theApp->GetStageFile())=="0.f3s")
-		theSetting->m_TimeMaster++;
+	if (CFile::GetPureFileNameOf(theApp->GetStageFile())=="0.f3s") {
+		if (++theSetting->m_TimeMaster==1)		ending += "<br><Secret 2!!";
+	}
 	// Secret 3!!
-	if (theSetting->m_Banana>=1000) theSetting->m_Eyewitness++;
+	if (theSetting->m_Banana>=1000) {
+		if (++theSetting->m_Eyewitness==1)		ending += "<br>Secret 3!!";
+	}
 	// Secret 4!!
-	if (m_bSecret4) theSetting->m_FeatherIron++;
+	if (m_bSecret4) {
+		if (++theSetting->m_FeatherIron==1)		ending += "<br>Secret 4!!";
+	}
 	// Secret 5!!
-	if (theSetting->m_SleepTime>=40*60*10) theSetting->m_GrapeColored++;
+	if (theSetting->m_SleepTime>=40*60*10) {
+		if (++theSetting->m_GrapeColored==1)	ending += "<br>Secret 5!!";
+	}
 	// Secret 6!!
-	if (theSetting->m_PlayTime>=60*60*10) theSetting->m_Esrever++;
+	if (theSetting->m_PlayTime>=60*60*10) {
+		if (++theSetting->m_Esrever==1)			ending += "<br>Secret 6!!";
+	}
 	// Secret 7!!
-	if (theSetting->m_Smiles>=100) theSetting->m_Outline++;
+	if (theSetting->m_Smiles>=100) {
+		if (++theSetting->m_Outline==1)			ending += "<br>Secret 7!!";
+	}
 	// Secret 8!!
-	if (theSetting->m_Banana>=10000) theSetting->m_ColdMan++;
+	if (theSetting->m_Banana>=10000) {
+		if (++theSetting->m_ColdMan==1)			ending += "<br>Secret 8!!";
+	}
 	// Secret 9!!
-	if (theSetting->m_PlayTime>=60*60*100) theSetting->m_AndBalloon++;
+	if (theSetting->m_PlayTime>=60*60*100) {
+		if (++theSetting->m_AndBalloon==1)		ending += "<br>Secret 9!!";
+	}
 	// Perfect!!
 /*	if (setting->m_Smiles&&setting->m_TimeMaster&&setting->m_Eyewitness&&
 		setting->m_FeatherIron&&setting->m_GrapeColored&&
-		setting->m_Esrever&&setting->m_Outline&&setting->m_ColdMan)
-		setting->???++;*/
+		setting->m_Esrever&&setting->m_Outline&&setting->m_ColdMan) {
+		if (++theSetting->==1)					ending += "<br>Secret 10!!";
+	}*/
 	theSetting->SetProgress(theApp->GetStageFile(), 0);
+
+	m_Message->SetText(ending);
+	m_Message->Update();
+	m_MessageCount = -1;
 }
 
 void CGameScene::GameOver()
 {
-	m_Message->GetFont()->SetText("Game Over!!");
-	m_Message->UpdateText();
+	m_Message->SetText("Game Over!!");
+	m_Message->Update();
 	m_Select->Clear();
 	if (theSetting->m_Banana>=m_nPenalty) {
 		char buf[1024];
@@ -410,8 +444,8 @@ void CGameScene::Pause()
 	int sw,sh;
 	m_Select->GetSize(sw,sh);
 	m_Select->SetPos(160-sw/2,136-sh/2);
-	m_Message->GetFont()->SetText("Pause");
-	m_Message->UpdateText();
+	m_Message->SetText("Pause");
+	m_Message->Update();
 	m_MessageCount = -1;
 }
 

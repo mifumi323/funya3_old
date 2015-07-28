@@ -18,7 +18,7 @@ typedef strstrlist::iterator strstriterator;
 class CResultScene : public CSceneBase  
 {
 protected:
-	Cf3NavigationBar	*m_NavigationBar;
+//	Cf3NavigationBar	*m_NavigationBar;
 	TTextNavi			m_TextNavi;
 
 	CTextDIB32			*m_TextTitle;

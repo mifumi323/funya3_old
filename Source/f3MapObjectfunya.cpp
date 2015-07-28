@@ -44,6 +44,8 @@ const float MAXDISTANCE = 1.6e5f;
 #define COS60	SIN30
 #define COS75	SIN15
 
+#define INVINCITY 0
+
 //////////////////////////////////////////////////////////////////////
 // ç\íz/è¡ñ≈
 //////////////////////////////////////////////////////////////////////
@@ -57,7 +59,7 @@ Cf3MapObjectfunya::Cf3MapObjectfunya(int nCX, int nCY)
 	m_ChargePower = 0;
 	m_ChargeDec = 0.001f;
 	m_nPower = 0;
-	m_Power = 0.0f;
+	m_Power = m_PowerX = m_PowerY = 0.0f;
 	m_Direction = DIR_FRONT;
 	m_HitLeft = m_HitRight = m_HitTop = m_OnEnemy = false; m_HitBottom = true;
 	Land();
@@ -409,8 +411,10 @@ void Cf3MapObjectfunya::HitCheck()
 			}
 		}
 	}
+#if !INVINCITY
 	if (m_pParent->GetHit(CX,CY,HIT_DEATH)) Die();
 	if (m_Y-14 > 32*m_pParent->GetHeight()) Die();
+#endif
 }
 
 void Cf3MapObjectfunya::Die()
@@ -495,6 +499,7 @@ void Cf3MapObjectfunya::Synergy()
 		}
 	}
 	// Ç∆Ç∞Ç∆Ç∞
+#if !INVINCITY
 	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_NEEDLE); (*it)!=NULL; it++){
 		if ((*it)->IsValid()) {
 			float objX, objY;
@@ -505,6 +510,7 @@ void Cf3MapObjectfunya::Synergy()
 			}
 		}
 	}
+#endif
 	// ÉEÉiÉMÉJÉYÉâ
 	for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_EELPITCHER); (*it)!=NULL; it++){
 		if ((*it)->IsValid()&&((Cf3MapObjectEelPitcher*)(*it))->IsLeaf()) {
@@ -523,6 +529,7 @@ void Cf3MapObjectfunya::Synergy()
 	}
 	if (m_State!=FROZEN) {
 		// ïX
+#if !INVINCITY
 		for(it=m_pParent->GetMapObjects(m_nCX-2, m_nCY-2, m_nCX+2, m_nCY+2, OID_ICE); (*it)!=NULL; it++){
 			if ((*it)->IsValid()&&((Cf3MapObjectIce*)(*it))->GetSize()>10) {
 				float objX, objY;
@@ -533,6 +540,7 @@ void Cf3MapObjectfunya::Synergy()
 				}
 			}
 		}
+#endif
 		// ïXÉ]Å[Éì
 		for(set<Cf3MapObjectIceSource*>::iterator is = Cf3MapObjectIceSource::IteratorBegin();
 		is!=Cf3MapObjectIceSource::IteratorEnd();is++){
@@ -558,13 +566,17 @@ void Cf3MapObjectfunya::Synergy()
 			}
 		}
 		if (m_Power>1.0f/256.0f) {
+#if !INVINCITY
 			Freeze();
+#endif
 		}ef(m_Power>1.0f/4096.0f) {
 			m_nPower=4;
 			m_PowerX = m_PowerY = 0.0f;
 		}ef(m_Power<-1.0f/256.0f) {
+#if !INVINCITY
 			Die();
 		}ef(m_Power<-1.0f/4096.0f) {
+#endif
 		}else{
 			m_PowerX = m_PowerY = 0.0f;
 		}
